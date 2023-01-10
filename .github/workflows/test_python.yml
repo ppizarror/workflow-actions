@@ -18,6 +18,10 @@ on:
         description: "Use coverage with codecov.io"
         required: false
         type: boolean
+      env_vars:
+        description: "List of environment variables to set up, given in env=value format"
+        required: false
+        type: string
       os:
         description: "OS to run the job"
         required: true
@@ -52,6 +56,14 @@ jobs:
             fetch-depth: ${{ inputs.checkout_fetch_depth }}
             submodules: recursive
             token: ${{ inputs.checkout_token }}
+
+        - name: Set environment variables
+          if: ${{ inputs.env_vars }}
+          run: |
+            for i in "${{ inputs.env_vars }}"
+            do
+              printf "%s\n" $i >> $GITHUB_ENV
+            done
 
         - name: Set up Python ${{ inputs.python_version }}
           uses: actions/setup-python@v4
