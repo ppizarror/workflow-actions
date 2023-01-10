@@ -1,0 +1,60 @@
+name: Test
+
+on:
+  workflow_call:
+    inputs:
+      checkout_fetch_depth:
+        default: 0
+        description: "Number of commits to fetch. 0 indicates all history for all branches and tags"
+        required: false
+        type: number
+      coverage_report:
+        default: true
+        description: "Use coverage with codecov.io"
+        required: false
+        type: boolean
+      os:
+        description: "OS to run the job"
+        required: true
+        type: string
+      python_version:
+        description: "Python version"
+        required: true
+        type: string
+      timeout:
+        default: 120
+        description: "Job timeout"
+        required: false
+        type: number
+
+jobs:
+    test:
+      name: Test
+      runs-on: ${{ inputs.os }}
+      timeout-minutes: ${{ inputs.timeout }}
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v3
+          with:
+            fetch-depth: ${{ inputs.checkout_fetch_depth }}
+            submodules: recursive
+            token: ${{ secrets.ACTIONS }}
+
+        - name: Set up Python ${{ inputs.python_version }}
+          uses: actions/setup-python@v4
+          with:
+            cache: pip
+            python-version: ${{ inputs.python_version }}
+
+        - name: Install dependencies
+          run: pip install -e .[test]
+
+        - name: Test
+          shell: bash
+          run: |
+            export PYTHONPATH=$PWD
+            nose2 --verbose --with-coverage
+
+        - name: Coverage report
+          if: ${{ inputs.coverage_report }}
+          run: bash <(curl -s https://codecov.io/bash)
