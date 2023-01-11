@@ -12,7 +12,7 @@ on:
         default: false
         description: "Checkout token. If true, uses secrets.ACTIONS"
         required: false
-        type: string
+        type: boolean
       coverage_report:
         default: true
         description: "Use coverage with codecov.io"
