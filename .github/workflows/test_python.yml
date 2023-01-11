@@ -38,7 +38,7 @@ jobs:
     timeout-minutes: ${{ inputs.timeout }}
     steps:
       - name: Checkout
-        env: 
+        env:
           token: ${{ secrets.ACTIONS }}
         if: ${{ env.token == '' }}
         uses: actions/checkout@v3
@@ -47,7 +47,7 @@ jobs:
           submodules: recursive
 
       - name: Checkout (with token)
-        env: 
+        env:
           token: ${{ secrets.ACTIONS }}
         if: ${{ env.token != '' }}
         uses: actions/checkout@v3
