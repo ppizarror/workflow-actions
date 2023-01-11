@@ -8,11 +8,6 @@ on:
         description: "Number of commits to fetch. 0 indicates all history for all branches and tags"
         required: false
         type: number
-      checkout_token:
-        default: false
-        description: "Checkout token. If true, uses secrets.ACTIONS"
-        required: false
-        type: boolean
       coverage_report:
         default: true
         description: "Use coverage with codecov.io"
@@ -43,14 +38,18 @@ jobs:
     timeout-minutes: ${{ inputs.timeout }}
     steps:
       - name: Checkout
-        if: ${{ !inputs.checkout_token }}
+        env: 
+          token: ${{ secrets.ACTIONS }}
+        if: ${{ env.token == '' }}
         uses: actions/checkout@v3
         with:
           fetch-depth: ${{ inputs.checkout_fetch_depth }}
           submodules: recursive
 
       - name: Checkout (with token)
-        if: ${{ inputs.checkout_token }}
+        env: 
+          token: ${{ secrets.ACTIONS }}
+        if: ${{ env.token != '' }}
         uses: actions/checkout@v3
         with:
           fetch-depth: ${{ inputs.checkout_fetch_depth }}
