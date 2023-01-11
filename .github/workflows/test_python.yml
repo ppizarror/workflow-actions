@@ -9,8 +9,8 @@ on:
         required: false
         type: number
       checkout_token:
-        default: ""
-        description: "Checkout token. If empty, ignore"
+        default: false
+        description: "Checkout token. If true, uses secrets.ACTIONS"
         required: false
         type: string
       coverage_report:
@@ -43,19 +43,19 @@ jobs:
       timeout-minutes: ${{ inputs.timeout }}
       steps:
         - name: Checkout
-          if: ${{ inputs.checkout_token == '' }}
+          if: ${{ !inputs.checkout_token }}
           uses: actions/checkout@v3
           with:
             fetch-depth: ${{ inputs.checkout_fetch_depth }}
             submodules: recursive
 
         - name: Checkout (with token)
-          if: ${{ inputs.checkout_token != '' }}
+          if: ${{ inputs.checkout_token }}
           uses: actions/checkout@v3
           with:
             fetch-depth: ${{ inputs.checkout_fetch_depth }}
             submodules: recursive
-            token: ${{ inputs.checkout_token }}
+            token: ${{ secrets.ACTIONS }}
 
         - name: Set environment variables
           if: ${{ inputs.env_vars }}
