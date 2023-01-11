@@ -37,51 +37,51 @@ on:
         type: number
 
 jobs:
-    test:
-      name: Test
-      runs-on: ${{ inputs.os }}
-      timeout-minutes: ${{ inputs.timeout }}
-      steps:
-        - name: Checkout
-          if: ${{ !inputs.checkout_token }}
-          uses: actions/checkout@v3
-          with:
-            fetch-depth: ${{ inputs.checkout_fetch_depth }}
-            submodules: recursive
+  test:
+    name: Test
+    runs-on: ${{ inputs.os }}
+    timeout-minutes: ${{ inputs.timeout }}
+    steps:
+      - name: Checkout
+        if: ${{ !inputs.checkout_token }}
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: ${{ inputs.checkout_fetch_depth }}
+          submodules: recursive
 
-        - name: Checkout (with token)
-          if: ${{ inputs.checkout_token }}
-          uses: actions/checkout@v3
-          with:
-            fetch-depth: ${{ inputs.checkout_fetch_depth }}
-            submodules: recursive
-            token: ${{ secrets.ACTIONS }}
+      - name: Checkout (with token)
+        if: ${{ inputs.checkout_token }}
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: ${{ inputs.checkout_fetch_depth }}
+          submodules: recursive
+          token: ${{ secrets.ACTIONS }}
 
-        - name: Set environment variables
-          if: ${{ inputs.env_vars }}
-          shell: bash
-          run: |
-            for i in "${{ inputs.env_vars }}"
-            do
-              printf "%s\n" $i >> $GITHUB_ENV
-            done
+      - name: Set environment variables
+        if: ${{ inputs.env_vars }}
+        shell: bash
+        run: |
+          for i in "${{ inputs.env_vars }}"
+          do
+            printf "%s\n" $i >> $GITHUB_ENV
+          done
 
-        - name: Set up Python ${{ inputs.python_version }}
-          uses: actions/setup-python@v4
-          with:
-            cache: pip
-            python-version: ${{ inputs.python_version }}
+      - name: Set up Python ${{ inputs.python_version }}
+        uses: actions/setup-python@v4
+        with:
+          cache: pip
+          python-version: ${{ inputs.python_version }}
 
-        - name: Install dependencies
-          shell: bash
-          run: pip install -e .[test]
+      - name: Install dependencies
+        shell: bash
+        run: pip install -e .[test]
 
-        - name: Test
-          shell: bash
-          run: |
-            export PYTHONPATH=$PWD
-            nose2 --verbose --with-coverage
+      - name: Test
+        shell: bash
+        run: |
+          export PYTHONPATH=$PWD
+          nose2 --verbose --with-coverage
 
-        - name: Coverage report
-          if: ${{ inputs.coverage_report }}
-          run: bash <(curl -s https://codecov.io/bash)
+      - name: Coverage report
+        if: ${{ inputs.coverage_report }}
+        run: bash <(curl -s https://codecov.io/bash)
