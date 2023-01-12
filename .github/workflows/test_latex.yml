@@ -9,7 +9,7 @@ on:
         required: false
         type: number
       file:
-        default: "main.tex"
+        default: "main"
         description: "Name of the .tex file to test"
         required: false
         type: string
@@ -55,7 +55,7 @@ jobs:
       - name: Compile LaTeX document
         uses: xu-cheng/latex-action@v2
         with:
-          root_file: ${{ inputs.file }}
+          root_file: ${{ inputs.file }}.tex
 
       - name: Check pdf files
         run: |
