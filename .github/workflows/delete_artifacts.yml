@@ -17,7 +17,7 @@ jobs:
                 console.log(`Deleting artifacts from workflow run ${workflow_run.id}`)
                 const response = await github.request(`GET /repos/${{ github.repository }}/actions/runs/${workflow_run.id}/artifacts`)
                 for (artifact of response.data.artifacts) {
-                  console.log(`Deleting artifact with id ${artifact.id}`)
+                  console.log(`\tDeleting artifact with id ${artifact.id}`)
                   const deleteResponse = await github.request(`DELETE /repos/${{ github.repository }}/actions/artifacts/${artifact.id}`)
                 }
               }
