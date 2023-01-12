@@ -46,7 +46,6 @@ jobs:
 
       - name: Set environment variables
         if: ${{ inputs.env_vars }}
-        shell: bash
         run: |
           for i in "${{ inputs.env_vars }}"
           do
@@ -57,3 +56,12 @@ jobs:
         uses: xu-cheng/latex-action@v2
         with:
           root_file: ${{ inputs.file }}
+
+      - name: Check pdf files
+        run: file ${{ inputs.file }}.pdf | grep -q ' PDF '
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: PDF
+          path: ${{ inputs.file }}.pdf
