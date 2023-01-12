@@ -8,9 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Delete artifacts from previous runs
-        uses: actions/github-script@v3
+        uses: actions/github-script@v6
         with:
-          github-token: ${{ github.token }}
           script: |
             const runsResponse = await github.request("GET /repos/${{ github.repository }}/actions/runs")
             for (workflow_run of runsResponse.data.workflow_runs) {
