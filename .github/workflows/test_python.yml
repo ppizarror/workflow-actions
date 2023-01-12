@@ -33,7 +33,6 @@ on:
 
 jobs:
   test:
-    name: Test
     runs-on: ${{ inputs.os }}
     timeout-minutes: ${{ inputs.timeout }}
     steps:

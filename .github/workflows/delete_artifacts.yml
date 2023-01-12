@@ -5,10 +5,10 @@ on:
 
 jobs:
   delete-artifacts:
-    name: Delete artifacts from previous runs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/github-script@v3
+      - name: Delete artifacts from previous runs
+        uses: actions/github-script@v3
         with:
           github-token: ${{ github.token }}
           script: |
