@@ -24,7 +24,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Initialize CodeQL - ${{ inputs.language }}
+      - name: Initialize CodeQL (${{ inputs.language }})
         uses: github/codeql-action/init@v2
         with:
           languages: ${{ inputs.language }}

@@ -3,17 +3,17 @@ name: Test Python
 on:
   workflow_call:
     inputs:
-      checkout_fetch_depth:
+      checkout-fetch-depth:
         default: 1
         description: "Number of commits to fetch. 0 indicates all history for all branches and tags"
         required: false
         type: number
-      coverage_report:
+      coverage-report:
         default: true
         description: "Use coverage with codecov.io"
         required: false
         type: boolean
-      env_vars:
+      env-vars:
         description: "List of environment variables to set up, given in env=value format"
         required: false
         type: string
@@ -21,7 +21,7 @@ on:
         description: "OS to run the job"
         required: true
         type: string
-      python_version:
+      python-version:
         description: "Python version"
         required: true
         type: string
@@ -43,7 +43,7 @@ jobs:
         if: ${{ env.token == '' }}
         uses: actions/checkout@v3
         with:
-          fetch-depth: ${{ inputs.checkout_fetch_depth }}
+          fetch-depth: ${{ inputs.checkout-fetch-depth }}
           submodules: recursive
 
       - name: Checkout (with token)
@@ -52,24 +52,24 @@ jobs:
         if: ${{ env.token != '' }}
         uses: actions/checkout@v3
         with:
-          fetch-depth: ${{ inputs.checkout_fetch_depth }}
+          fetch-depth: ${{ inputs.checkout-fetch-depth }}
           submodules: recursive
           token: ${{ secrets.ACTIONS }}
 
       - name: Set environment variables
-        if: ${{ inputs.env_vars }}
+        if: ${{ inputs.env-vars }}
         shell: bash
         run: |
-          for i in "${{ inputs.env_vars }}"
+          for i in "${{ inputs.env-vars }}"
           do
             printf "%s\n" $i >> $GITHUB_ENV
           done
 
-      - name: Set up Python ${{ inputs.python_version }}
+      - name: Set up Python ${{ inputs.python-version }}
         uses: actions/setup-python@v4
         with:
           cache: pip
-          python-version: ${{ inputs.python_version }}
+          python-version: ${{ inputs.python-version }}
 
       - name: Install dependencies
         shell: bash
@@ -82,5 +82,5 @@ jobs:
           nose2 --verbose --with-coverage
 
       - name: Coverage report
-        if: ${{ inputs.coverage_report }}
+        if: ${{ inputs.coverage-report }}
         run: bash <(curl -s https://codecov.io/bash)
