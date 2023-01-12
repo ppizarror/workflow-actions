@@ -9,9 +9,8 @@ on:
         required: false
         type: number
       file:
-        default: "main"
-        description: "Name of the .tex file to test"
-        required: false
+        description: "Name of the tex file to test (without extension)"
+        required: true
         type: string
       timeout:
         default: 120
