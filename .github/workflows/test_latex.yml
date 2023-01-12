@@ -1,0 +1,59 @@
+name: Test LaTeX
+
+on:
+  workflow_call:
+    inputs:
+      checkout_fetch_depth:
+        default: 1
+        description: "Number of commits to fetch. 0 indicates all history for all branches and tags"
+        required: false
+        type: number
+      file:
+        default: "main.tex"
+        description: "Name of the .tex file to test"
+        required: false
+        type: string
+      timeout:
+        default: 120
+        description: "Job timeout"
+        required: false
+        type: number
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ inputs.timeout }}
+    steps:
+      - name: Checkout
+        env:
+          token: ${{ secrets.ACTIONS }}
+        if: ${{ env.token == '' }}
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: ${{ inputs.checkout_fetch_depth }}
+          submodules: recursive
+
+      - name: Checkout (with token)
+        env:
+          token: ${{ secrets.ACTIONS }}
+        if: ${{ env.token != '' }}
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: ${{ inputs.checkout_fetch_depth }}
+          submodules: recursive
+          token: ${{ secrets.ACTIONS }}
+
+      - name: Set environment variables
+        if: ${{ inputs.env_vars }}
+        shell: bash
+        run: |
+          for i in "${{ inputs.env_vars }}"
+          do
+            printf "%s\n" $i >> $GITHUB_ENV
+          done
+
+      - name: Compile LaTeX document
+        uses: xu-cheng/latex-action@v2
+        with:
+          root_file: ${{ inputs.file }}
