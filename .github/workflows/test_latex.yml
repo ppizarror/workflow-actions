@@ -58,7 +58,9 @@ jobs:
           root_file: ${{ inputs.file }}
 
       - name: Check pdf files
-        run: file ${{ inputs.file }}.pdf | grep -q ' PDF '
+        run: |
+          ls -l
+          file ${{ inputs.file }}.pdf | grep -q ' PDF '
 
       - name: Upload PDF artifact
         uses: actions/upload-artifact@v3
