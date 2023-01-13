@@ -88,4 +88,5 @@ jobs:
 
       - name: Coverage report
         if: ${{ inputs.coverage-report }}
+        shell: bash
         run: bash <(curl -s https://codecov.io/bash)
