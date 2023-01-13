@@ -3,6 +3,11 @@ name: Test Python
 on:
   workflow_call:
     inputs:
+      cache-dependency-path:
+        default: "**/requirements.txt"
+        description: "Used to specify the path to dependency files. Supports wildcards or a list of file names for caching multiple dependencies."
+        required: false
+        type: string
       checkout-fetch-depth:
         default: 1
         description: "Number of commits to fetch. 0 indicates all history for all branches and tags"
@@ -68,6 +73,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           cache: pip
+          cache-dependency-path: ${{ inputs.cache-dependency-path }}
           python-version: ${{ inputs.python-version }}
 
       - name: Install dependencies
