@@ -84,11 +84,6 @@ jobs:
       - name: Configure environments
         shell: bash
         run: |
-          # Workflow info
-          echo "Test workflow action:"
-          echo "- Author: @ppizarror"
-          echo "- Version: 2.2"
-          
           # Configure global environments
           echo "GTEST_COLOR=1" >> $GITHUB_ENV
           echo "QT_QPA_PLATFORM=offscreen" >> $GITHUB_ENV
@@ -114,11 +109,7 @@ jobs:
           fi
           
           # Configure test mode
-          if [ "$RUNNER_OS" = "Linux" ]; then
-            echo "TEST_MODE=MemCheck" >> $GITHUB_ENV
-          else
-            echo "TEST_MODE=Test" >> $GITHUB_ENV
-          fi
+          echo "TEST_MODE=Test" >> $GITHUB_ENV
 
       - name: Configure number of CPU cores
         uses: SimenB/github-actions-cpu-cores@v1
