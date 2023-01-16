@@ -30,6 +30,21 @@ on:
         description: "Python version"
         required: true
         type: string
+      test:
+        default: true
+        description: "Enable testing execution with ctest"
+        required: false
+        type: boolean
+      test-after:
+        default: ""
+        description: "Run a custom bash command after main test passed. Runs inside root path"
+        required: false
+        type: string
+      test-before:
+        default: ""
+        description: "Run a custom bash command before main test are executed. Runs inside root path"
+        required: false
+        type: string
       timeout:
         default: 120
         description: "Job timeout"
@@ -81,10 +96,13 @@ jobs:
         run: pip install -e .[test]
 
       - name: Test
+        if: ${{ inputs.test }}
         shell: bash
         run: |
           export PYTHONPATH=$PWD
+          ${{ inputs.test-before }}
           nose2 --verbose --with-coverage
+          ${{ inputs.test-after }}
 
       - name: Coverage report
         if: ${{ inputs.coverage-report }}
