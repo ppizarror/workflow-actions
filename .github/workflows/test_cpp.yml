@@ -1,0 +1,240 @@
+name: Test C++
+
+on:
+  workflow_call:
+    inputs:
+      build-type:
+        default: "Debug"
+        description: "Which build type to use for C++ (Debug, Release, etc.)"
+        required: false
+        type: string
+      ccache-max-size:
+        default: "1G"
+        description: "Max size of ccache"
+        required: false
+        type: string
+      checkout-fetch-depth:
+        default: 0
+        description: "Number of commits to fetch. 0 indicates all history for all branches and tags"
+        required: false
+        type: number
+      env-vars:
+        description: "List of environment variables to set up, given in env=value format"
+        required: false
+        type: string
+      linter:
+        default: true
+        description: "Use C++ linter"
+        required: false
+        type: boolean
+      os:
+        description: "OS to run the job"
+        required: true
+        type: string
+      qt-install:
+        default: true
+        description: "QT: Install"
+        required: false
+        type: boolean
+      qt-modules:
+        default: "qtcharts"
+        description: "QT: Which modules to be installed"
+        required: false
+        type: string
+      qt-version:
+        default: "6.*"
+        description: "QT: Which version to be installed"
+        required: false
+        type: string
+      release-windows:
+        default: false
+        description: "If true, compile in Release mode and upload artifact (only for Windows)"
+        required: false
+        type: boolean
+      timeout:
+        default: 120
+        description: "Job timeout"
+        required: false
+        type: number
+
+jobs:
+  test:
+    runs-on: ${{ inputs.os }}
+    timeout-minutes: ${{ inputs.timeout }}
+    steps:
+      - name: Checkout
+        env:
+          token: ${{ secrets.ACTIONS }}
+        if: ${{ env.token == '' }}
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: ${{ inputs.checkout-fetch-depth }}
+          submodules: recursive
+
+      - name: Checkout (with token)
+        env:
+          token: ${{ secrets.ACTIONS }}
+        if: ${{ env.token != '' }}
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: ${{ inputs.checkout-fetch-depth }}
+          submodules: recursive
+          token: ${{ secrets.ACTIONS }}
+
+      - name: Configure environments
+        shell: bash
+        run: |
+          # Workflow info
+          echo "Test workflow action:"
+          echo "- Author: @ppizarror"
+          echo "- Version: 2.2"
+          
+          # Configure global environments
+          echo "GTEST_COLOR=1" >> $GITHUB_ENV
+          echo "QT_QPA_PLATFORM=offscreen" >> $GITHUB_ENV
+          
+          # Configure envs from workflow input
+          for i in "${{ inputs.env-vars }}"
+          do
+            printf "%s\n" $i >> $GITHUB_ENV
+          done
+          
+          # Configure CMake/Qt/Ccache
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            echo "CMAKE_GENERATOR='Ninja'" >> $GITHUB_ENV
+            echo "QT_ARCH=win64_mingw" >> $GITHUB_ENV
+            if [ "${{ inputs.build-type }}" = "Debug" ]; then
+              echo "CCACHE_VARIANT=sccache" >> $GITHUB_ENV
+            fi
+          else
+            echo "CMAKE_GENERATOR='Unix Makefiles'" >> $GITHUB_ENV
+            if [ "${{ inputs.build-type }}" = "Debug" ]; then
+              echo "CCACHE_VARIANT=ccache" >> $GITHUB_ENV
+            fi
+          fi
+          
+          # Configure test mode
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            echo "TEST_MODE=MemCheck" >> $GITHUB_ENV
+          else
+            echo "TEST_MODE=Test" >> $GITHUB_ENV
+          fi
+
+      - name: Configure number of CPU cores
+        uses: SimenB/github-actions-cpu-cores@v1
+        id: cpu-cores
+
+      - name: Install QT
+        if: ${{ inputs.qt-install }}
+        uses: jurplel/install-qt-action@v3
+        with:
+          arch: ${{ env.QT_ARCH }}
+          cache: true
+          modules: ${{ inputs.qt-modules }}
+          version: ${{ inputs.qt-version }}
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          # Post-configure QT
+          if [ "${{ inputs.qt-install }}" = "true" ]; then
+            qt_v=$(qmake -query QT_VERSION)
+            echo "QT_VERSION=$qt_v" >> $GITHUB_ENV
+          fi
+          
+          # Install packages for windows (ccache)
+          if [ "$RUNNER_OS" = "Windows" ] && [ "$CCACHE_VARIANT" = "ccache" ]; then
+            choco upgrade ccache
+            choco install ninja
+          fi
+
+      - name: Install ccache
+        if: ${{ inputs.build-type == 'Debug' }}
+        uses: hendrikmuhs/ccache-action@v1
+        with:
+          key: ${{ inputs.os }}-${{ inputs.build-type }}-qt${{ env.QT_VERSION }}
+          max-size: ${{ inputs.ccache-max-size }}
+          variant: ${{ env.CCACHE_VARIANT }}
+          verbose: 2
+
+      - name: Configure ccache
+        if: ${{ inputs.build-type == 'Debug' }}
+        shell: bash
+        run: |
+          echo "Cache variant: $CCACHE_VARIANT"
+          if [ "$CCACHE_VARIANT" = "ccache" ]; then
+            ccache --version
+            ccache -z # Zero stats
+          fi
+
+      - name: Configure GCC problem matcher
+        uses: ammaraskar/gcc-problem-matcher@master
+
+      - name: Configure CMake
+        run: >
+          cmake
+          -B ${{ github.workspace }}/build_${{ inputs.build-type }}
+          -DCMAKE_BUILD_TYPE=${{ inputs.build-type }}
+          -G ${{ env.CMAKE_GENERATOR }}
+          -DCMAKE_C_COMPILER_LAUNCHER=${{ env.CCACHE_VARIANT }}
+          -DCMAKE_CXX_COMPILER_LAUNCHER=${{ env.CCACHE_VARIANT }}
+
+      - name: Build
+        run: >
+          cmake
+          --build ${{ github.workspace }}/build_${{ inputs.build-type }}
+          --config ${{ inputs.build-type }}
+          -j ${{ steps.cpu-cores.outputs.count }}
+
+      - name: Test
+        working-directory: ${{ github.workspace }}/build_${{ inputs.build-type }}
+        run: >
+          ctest
+          -C ${{ inputs.build-type }}
+          -T ${{ env.TEST_MODE }}
+          --output-on-failure
+
+      - name: C++ Linter (Linux)
+        if: ${{ inputs.linter && runner.os == 'Linux' && github.event_name == 'pull_request' }}
+        uses: cpp-linter/cpp-linter-action@v2
+        id: linter
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACTIONS }}
+        with:
+          database: 'build/compile_commands.json'
+          extra-args: '-std=c++17'
+          files-changed-only: true
+          ignore: 'build | lib | ../Qt'
+          lines-changed-only: false
+          style: ''
+          tidy-checks: ''
+          version: 14
+
+      - name: Linter output check
+        if: ${{ steps.linter.outputs.checks-failed > 0 }}
+        run: exit 1
+
+      - name: Configure CMake release (Windows)
+        if: ${{ runner.os == 'Windows' && inputs.release-windows }}
+        run: >
+          cmake
+          -B ${{ github.workspace }}/build
+          -DCMAKE_BUILD_TYPE=Release
+          -G ${{ env.CMAKE_GENERATOR }}
+          -DCMAKE_C_COMPILER_LAUNCHER=${{ env.CCACHE_VARIANT }}
+          -DCMAKE_CXX_COMPILER_LAUNCHER=${{ env.CCACHE_VARIANT }}
+
+      - name: Build release (Windows)
+        if: ${{ runner.os == 'Windows' && inputs.release-windows }}
+        run: >
+          cmake
+          --build ${{ github.workspace }}/build
+          --config Release
+          -j ${{ steps.cpu-cores.outputs.count }}
+
+      - name: Upload release artifact (Windows)
+        if: ${{ runner.os == 'Windows' && inputs.release-windows }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-windows
+          path: ${{ github.workspace }}/build
