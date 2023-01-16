@@ -52,7 +52,7 @@ on:
         required: false
         type: boolean
       test-optional:
-        description: "Run a custom bash command after main test passed"
+        description: "Run a custom bash command after main test passed. Runs inside build/ path"
         required: false
         type: string
       timeout:
