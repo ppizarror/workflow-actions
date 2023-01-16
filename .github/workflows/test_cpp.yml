@@ -51,8 +51,14 @@ on:
         description: "If true, compile in Release mode and upload artifact (only for Windows)"
         required: false
         type: boolean
-      test-optional:
+      test-after:
+        default: ""
         description: "Run a custom bash command after main test passed. Runs inside build/ path"
+        required: false
+        type: string
+      test-before:
+        default: ""
+        description: "Run a custom bash command before main test are executed. Runs inside build/ path"
         required: false
         type: string
       timeout:
@@ -183,17 +189,11 @@ jobs:
 
       - name: Test
         working-directory: ${{ github.workspace }}/build_${{ inputs.build-type }}
-        run: >
-          ctest
-          -C ${{ inputs.build-type }}
-          -T ${{ env.TEST_MODE }}
-          --output-on-failure
-
-      - name: Test (Optional)
-        if: ${{ inputs.test-optional }}
-        working-directory: ${{ github.workspace }}/build_${{ inputs.build-type }}
         shell: bash
-        run: ${{ inputs.test-optional }}
+        run: |
+          ${{ inputs.test-before }}
+          ctest -C ${{ inputs.build-type }} -T ${{ env.TEST_MODE }} --output-on-failure
+          ${{ inputs.test-after }}
 
       - name: C++ Linter (Linux)
         if: ${{ inputs.linter && runner.os == 'Linux' && github.event_name == 'pull_request' }}
