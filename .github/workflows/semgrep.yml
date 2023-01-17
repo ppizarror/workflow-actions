@@ -3,11 +3,6 @@ name: Semgrep
 on:
   workflow_call:
     inputs:
-      custom-rules:
-        default: true
-        description: "Install custom rules"
-        required: false
-        type: boolean
       security-dashboard:
         default: false
         description: "Upload to Security tab (requires Advanced Security)"
@@ -31,29 +26,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Download rules
-        if: ${{ inputs.custom-rules }}
-        uses: actions/checkout@v3
-        with:
-          path: __workflow-actions
-          repository: ppizarror/workflow-actions
-
-      - name: Configure custom rules
-        if: ${{ inputs.custom-rules }}
-        shell: bash
-        run: |
-          rules=""
-          config() {
-            rules+=" __workflow-actions/semgrep/$1.yaml"
-          }
-          
-          # Configure C/C++ rules
-          config c/command-injection
-          config c/double-free
-          
-          # Write to path
-          echo "SEMGREP_RULES=$SEMGREP_RULES$rules" >> $GITHUB_ENV
 
       - name: Semgrep CI (Upload to Semgrep UI)
         if: ${{ !inputs.security-dashboard }}
