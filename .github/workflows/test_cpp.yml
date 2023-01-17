@@ -24,7 +24,7 @@ on:
         type: string
       linter:
         default: true
-        description: "Use C++ linter"
+        description: "Use C++ linter. Only for Linux"
         required: false
         type: boolean
       os:
@@ -48,7 +48,7 @@ on:
         type: string
       release-windows:
         default: false
-        description: "If true, compile in Release mode and upload artifact (only for Windows)"
+        description: "If true, compile in Release mode and upload artifact. Only for Windows"
         required: false
         type: boolean
       test:
