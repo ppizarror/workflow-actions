@@ -42,26 +42,30 @@ jobs:
       - name: Configure custom rules
         if: ${{ inputs.custom-rules }}
         run: |
+          rules=""
           config() {
-            semgrep --config __workflow-actions/semgrep/"$1".yaml
+            rules+="--config __workflow-actions/semgrep/$1.yaml "
           }
           
           # Configure C/C++ rules
           config c/command-injection
           config c/double-free
+          
+          # Write to path
+          echo "SEMGREP_CUSTOM_RULES=$rules" >> $GITHUB_ENV
 
       - name: Semgrep CI (Upload to Semgrep UI)
         if: ${{ !inputs.security-dashboard }}
         run: |
           # Run CLI
           echo "See semgrep results in https://semgrep.dev/orgs/-"
-          semgrep ci --verbose --no-suppress-errors ${{ inputs.semgrep-options }}
+          semgrep ci --verbose --no-suppress-errors ${{ inputs.semgrep-options }} $SEMGREP_CUSTOM_RULES
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
 
       - name: Semgrep CI (Upload to Advanced Security Dashboard)
         if: ${{ inputs.security-dashboard }}
-        run: semgrep ci --verbose --sarif --output=semgrep.sarif ${{ inputs.semgrep-options }}
+        run: semgrep ci --verbose --sarif --output=semgrep.sarif ${{ inputs.semgrep-options }} $SEMGREP_CUSTOM_RULES
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
 
