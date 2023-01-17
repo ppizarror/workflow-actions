@@ -43,7 +43,7 @@ jobs:
         if: ${{ inputs.custom-rules }}
         run: |
           config() {
-            echo semgrep --config __workflow-actions/semgrep/"$1".yaml
+            semgrep --config __workflow-actions/semgrep/"$1".yaml
           }
           
           # Configure C/C++ rules
