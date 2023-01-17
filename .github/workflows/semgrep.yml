@@ -45,7 +45,7 @@ jobs:
         run: |
           rules=""
           config() {
-            rules+="--config __workflow-actions/semgrep/$1.yaml "
+            rules+=" __workflow-actions/semgrep/$1.yaml"
           }
           
           # Configure C/C++ rules
@@ -53,7 +53,7 @@ jobs:
           config c/double-free
           
           # Write to path
-          echo "SEMGREP_CUSTOM_RULES=$rules" >> $GITHUB_ENV
+          echo "SEMGREP_RULES=$SEMGREP_RULES$rules" >> $GITHUB_ENV
 
       - name: Semgrep CI (Upload to Semgrep UI)
         if: ${{ !inputs.security-dashboard }}
@@ -61,14 +61,14 @@ jobs:
         run: |
           # Run CLI
           echo "See semgrep results in https://semgrep.dev/orgs/-"
-          semgrep ci --verbose --no-suppress-errors ${{ inputs.semgrep-options }} $SEMGREP_CUSTOM_RULES
+          semgrep ci --verbose --no-suppress-errors ${{ inputs.semgrep-options }}
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
 
       - name: Semgrep CI (Upload to Advanced Security Dashboard)
         if: ${{ inputs.security-dashboard }}
         shell: bash
-        run: semgrep ci --verbose --sarif --output=semgrep.sarif ${{ inputs.semgrep-options }} $SEMGREP_CUSTOM_RULES
+        run: semgrep ci --verbose --sarif --output=semgrep.sarif ${{ inputs.semgrep-options }}
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
 
