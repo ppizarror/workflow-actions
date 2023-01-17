@@ -36,8 +36,9 @@ jobs:
       - name: Semgrep CI (Upload to Semgrep UI)
         if: ${{ !inputs.security-dashboard }}
         run: |
+          # Run CLI
+          echo "See semgrep results in https://semgrep.dev/orgs/-"
           semgrep ci --verbose --no-suppress-errors ${{ inputs.semgrep-options }}
-          echo "See results in https://semgrep.dev/orgs/-"
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
 
