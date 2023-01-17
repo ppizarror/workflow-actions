@@ -36,14 +36,14 @@ jobs:
       - name: Semgrep CI (Upload to Semgrep UI)
         if: ${{ !inputs.security-dashboard }}
         run: |
-          semgrep ci --error ${{ inputs.semgrep-options }}
+          semgrep ci --verbose --error ${{ inputs.semgrep-options }}
           echo "See results in https://semgrep.dev/orgs/-"
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
 
       - name: Semgrep CI (Upload to Advanced Security Dashboard)
         if: ${{ inputs.security-dashboard }}
-        run: semgrep ci --sarif --output=semgrep.sarif ${{ inputs.semgrep-options }}
+        run: semgrep ci --verbose --sarif --output=semgrep.sarif ${{ inputs.semgrep-options }}
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
 
