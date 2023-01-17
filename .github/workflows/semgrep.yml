@@ -1,0 +1,19 @@
+name: Semgrep
+
+on:
+  workflow_call:
+
+jobs:
+  semgrep:
+    name: Scan
+    runs-on: ubuntu-20.04
+    env:
+      SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+    container:
+      image: returntocorp/semgrep
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Semgrep CI
+        run: semgrep ci
