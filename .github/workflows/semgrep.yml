@@ -8,6 +8,11 @@ on:
         description: "Upload to Security tab (requires Advanced Security)"
         required: false
         type: boolean
+      semgrep-options:
+        default: ""
+        description: "Options passed to semgrep CLI"
+        required: false
+        type: string
     secrets:
       SEMGREP_APP_TOKEN:
         required: true
@@ -31,14 +36,14 @@ jobs:
       - name: Semgrep CI (Upload to Semgrep UI)
         if: ${{ !inputs.security-dashboard }}
         run: |
-          semgrep ci
+          semgrep ci --error ${{ inputs.semgrep-options }}
           echo "See results in https://semgrep.dev/orgs/-"
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
 
       - name: Semgrep CI (Upload to Advanced Security Dashboard)
         if: ${{ inputs.security-dashboard }}
-        run: semgrep ci --sarif --output=semgrep.sarif
+        run: semgrep ci --sarif --output=semgrep.sarif ${{ inputs.semgrep-options }}
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
 
