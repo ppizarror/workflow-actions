@@ -24,8 +24,11 @@ jobs:
           token: ${{ secrets.SEMGREP_APP_TOKEN }}
         if: ${{ env.token == '' }}
         run: |
+          # Token failed
           echo "SEMGREP_APP_TOKEN must be within repo secrets. Call with secrets: inherit"
           exit 1
 
       - name: Semgrep CI
         run: semgrep ci
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
