@@ -19,7 +19,6 @@ on:
 
 jobs:
   semgrep:
-    name: Scan
     runs-on: ubuntu-latest
     if: ${{ github.actor != 'dependabot[bot]' }}
     container:

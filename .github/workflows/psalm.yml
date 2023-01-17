@@ -4,8 +4,7 @@ on:
   workflow_call:
 
 jobs:
-  semgrep:
-    name: Psalm
+  psalm:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
