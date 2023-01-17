@@ -1,0 +1,17 @@
+name: Psalm Static analysis
+
+on:
+  workflow_call:
+
+jobs:
+  semgrep:
+    name: Psalm
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Psalm
+        uses: docker://vimeo/psalm-github-actions
+        with:
+          security_analysis: true
