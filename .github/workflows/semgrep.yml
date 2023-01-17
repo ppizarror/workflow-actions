@@ -2,6 +2,9 @@ name: Semgrep
 
 on:
   workflow_call:
+    secrets:
+      SEMGREP_APP_TOKEN:
+        required: true
 
 permissions:
   actions: read
@@ -25,7 +28,7 @@ jobs:
         if: ${{ env.token == '' }}
         run: |
           # Token failed
-          echo "SEMGREP_APP_TOKEN must be within repo secrets. Call with secrets: inherit"
+          echo "SEMGREP_APP_TOKEN secret must be declared"
           exit 1
 
       - name: Semgrep CI
