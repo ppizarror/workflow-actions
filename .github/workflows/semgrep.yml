@@ -53,7 +53,7 @@ jobs:
           config c/double-free
           
           # Write to path
-          echo "$rules"
+          echo "SEMGREP_CUSTOM_RULES=$rules" >> $GITHUB_ENV
 
       - name: Semgrep CI (Upload to Semgrep UI)
         if: ${{ !inputs.security-dashboard }}
