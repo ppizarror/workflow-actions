@@ -3,6 +3,10 @@ name: PHP Static Analysis
 on:
   workflow_call:
     inputs:
+      configuration:
+        description: "Path of the configuration file"
+        required: false
+        type: string
       composer:
         description: "Path of composer.json file within root project folder"
         required: true
@@ -32,5 +36,6 @@ jobs:
       - name: Run phpstan
         uses: php-actions/phpstan@v3
         with:
+          configuration: ${{ inputs.configuration }}
           memory_limit: ${{ inputs.memory }}
           path: ${{ inputs.path }}
