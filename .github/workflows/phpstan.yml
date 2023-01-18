@@ -7,6 +7,11 @@ on:
         description: "Path of composer.json file within root project folder"
         required: true
         type: string
+      memory:
+        default: "256M"
+        description: "Memory limit"
+        required: false
+        type: string
       path:
         description: "Which path of the project to scan for"
         required: true
@@ -27,4 +32,5 @@ jobs:
       - name: Run phpstan
         uses: php-actions/phpstan@v3
         with:
+          memory_limit: ${{ inputs.memory }}
           path: ${{ inputs.path }}
