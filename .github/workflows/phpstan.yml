@@ -3,6 +3,10 @@ name: PHP Static Analysis
 on:
   workflow_call:
     inputs:
+      composer:
+        description: "Path of composer.json file within root project folder"
+        required: true
+        type: string
       path:
         description: "Which path of the project to scan for"
         required: true
@@ -16,6 +20,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Configure composer
+        working-directory: ${{ github.workspace }}/${{ inputs.composer }}
         uses: php-actions/composer@v6
 
       - name: Run phpstan
