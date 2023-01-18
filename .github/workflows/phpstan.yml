@@ -1,0 +1,23 @@
+name: PHP Static Analysis
+
+on:
+  workflow_call:
+    path:
+      description: "Which path of the project to scan for"
+      required: true
+      type: string
+
+jobs:
+  psalm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure composer
+        uses: php-actions/composer@v6
+
+      - name: Run phpstan
+        uses: php-actions/phpstan@v3
+        with:
+          path: ${{ inputs.path }}
