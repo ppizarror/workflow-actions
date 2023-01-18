@@ -18,7 +18,7 @@ on:
         required: true
 
 jobs:
-  semgrep:
+  analyze:
     runs-on: ubuntu-latest
     if: ${{ github.actor != 'dependabot[bot]' }}
     container:

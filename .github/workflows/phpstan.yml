@@ -9,7 +9,7 @@ on:
         type: string
 
 jobs:
-  phpstan:
+  analyze:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
