@@ -2,10 +2,11 @@ name: PHP Static Analysis
 
 on:
   workflow_call:
-    path:
-      description: "Which path of the project to scan for"
-      required: true
-      type: string
+    inputs:
+      path:
+        description: "Which path of the project to scan for"
+        required: true
+        type: string
 
 jobs:
   phpstan:
