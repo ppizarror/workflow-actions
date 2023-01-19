@@ -8,8 +8,9 @@ on:
         required: true
         type: string
       os:
+        default: "ubuntu-latest"
         description: "OS to run the job"
-        required: true
+        required: false
         type: string
 
 jobs:
