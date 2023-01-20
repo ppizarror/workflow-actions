@@ -76,7 +76,7 @@ on:
         required: false
 
 jobs:
-  test:
+  build:
     runs-on: ${{ inputs.os }}
     timeout-minutes: ${{ inputs.timeout }}
     steps:
