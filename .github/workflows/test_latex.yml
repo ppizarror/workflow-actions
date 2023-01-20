@@ -22,7 +22,7 @@ on:
         required: false
 
 jobs:
-  build:
+  run:
     runs-on: ubuntu-latest
     timeout-minutes: ${{ inputs.timeout }}
     steps:
