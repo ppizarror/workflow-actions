@@ -58,5 +58,5 @@ jobs:
       - name: Upload PDF artifact
         uses: actions/upload-artifact@v3
         with:
-          name: PDF
+          name: ${{ inputs.file }}
           path: ${{ inputs.file }}.pdf
