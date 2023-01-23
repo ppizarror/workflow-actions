@@ -219,20 +219,20 @@ jobs:
           ${{ inputs.test-after }}
 
       - name: C++ Linter (Linux)
-        if: ${{ inputs.linter && runner.os == 'Linux' && github.event_name == 'pull_request' }}
+        if: ${{ inputs.linter && runner.os == 'Linux' }}
         uses: cpp-linter/cpp-linter-action@v2
         id: linter
         env:
           GITHUB_TOKEN: ${{ secrets.ACTIONS }}
         with:
-          database: 'build/compile_commands.json'
+          database: '${{ github.workspace }}/build_${{ inputs.build-type }}/compile_commands.json'
           extra-args: '-std=c++17'
           files-changed-only: false
-          ignore: 'build | lib | ../Qt'
+          ignore: 'build_${{ inputs.build-type }} | lib | ../Qt'
           lines-changed-only: false
           style: ''
           tidy-checks: ''
-          version: 14
+          version: 15
 
       - name: Linter output check
         if: ${{ steps.linter.outputs.checks-failed > 0 }}
