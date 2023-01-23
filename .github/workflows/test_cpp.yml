@@ -227,7 +227,7 @@ jobs:
         with:
           database: '${{ github.workspace }}/build_${{ inputs.build-type }}/compile_commands.json'
           extra-args: '-std=c++17'
-          files-changed-only: false
+          files-changed-only: true
           ignore: 'build_${{ inputs.build-type }} | lib | ../Qt'
           lines-changed-only: false
           style: ''
