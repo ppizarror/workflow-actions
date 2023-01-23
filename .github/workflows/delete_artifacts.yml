@@ -2,12 +2,19 @@ name: Delete artifacts
 
 on:
   workflow_call:
+    inputs:
+      pr:
+        default: false
+        description: "Remove artifacts only on PR mode"
+        required: false
+        type: boolean
 
 jobs:
   delete:
     runs-on: ubuntu-latest
     steps:
       - name: Delete artifacts from previous runs
+        if: ${{ !inputs.pr || inputs.pr && github.event_name == 'pull_request' }}
         uses: actions/github-script@v6
         with:
           script: |

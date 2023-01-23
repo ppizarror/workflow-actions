@@ -51,6 +51,11 @@ on:
         description: "If true, compile in Release mode and upload artifact. Only for Windows"
         required: false
         type: boolean
+      release-windows-pr:
+        default: true
+        description: "Compile release only in PR mode"
+        required: false
+        type: boolean
       test:
         default: true
         description: "Enable testing execution with ctest"
@@ -224,8 +229,17 @@ jobs:
         if: ${{ steps.linter.outputs.checks-failed > 0 }}
         run: exit 1
 
+      - name: Check release requirements (Windows)
+        if: ${{ runner.os == 'Windows' && inputs.release-windows && ( !inputs.release-windows-pr || inputs.release-windows-pr && github.event_name == 'pull_request' ) }}
+        shell: bash
+        run: |
+          echo "RELEASE_WIN=true" >> $GITHUB_ENV
+          if [ "${{ inputs.release-windows-pr }}" = "true" ]; then
+            echo "Release enabled in PR mode only"
+          fi
+
       - name: Configure CMake release (Windows)
-        if: ${{ runner.os == 'Windows' && inputs.release-windows }}
+        if: ${{ env.RELEASE_WIN == 'true' }}
         run: >
           cmake
           -B ${{ github.workspace }}/build
@@ -235,7 +249,7 @@ jobs:
           -DCMAKE_CXX_COMPILER_LAUNCHER=${{ env.CCACHE_VARIANT }}
 
       - name: Build release (Windows)
-        if: ${{ runner.os == 'Windows' && inputs.release-windows }}
+        if: ${{ env.RELEASE_WIN == 'true' }}
         run: >
           cmake
           --build ${{ github.workspace }}/build
@@ -243,7 +257,7 @@ jobs:
           -j ${{ steps.cpu-cores.outputs.count }}
 
       - name: Upload release artifact (Windows)
-        if: ${{ runner.os == 'Windows' && inputs.release-windows }}
+        if: ${{ env.RELEASE_WIN == 'true' }}
         uses: actions/upload-artifact@v3
         with:
           name: build-windows
