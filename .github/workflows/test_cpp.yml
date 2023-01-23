@@ -218,7 +218,7 @@ jobs:
         with:
           database: 'build/compile_commands.json'
           extra-args: '-std=c++17'
-          files-changed-only: true
+          files-changed-only: false
           ignore: 'build | lib | ../Qt'
           lines-changed-only: false
           style: ''
