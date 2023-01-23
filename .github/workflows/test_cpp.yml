@@ -235,7 +235,9 @@ jobs:
         run: |
           echo "RELEASE_WIN=true" >> $GITHUB_ENV
           if [ "${{ inputs.release-windows-pr }}" = "true" ]; then
-            echo "Release enabled in PR mode only"
+            echo "Release enabled in PR mode"
+          else
+            echo "Release enabled in non-PR mode"
           fi
 
       - name: Configure CMake release (Windows)
