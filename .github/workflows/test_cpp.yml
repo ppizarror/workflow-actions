@@ -194,6 +194,15 @@ jobs:
           -DCMAKE_CXX_COMPILER_LAUNCHER=${{ env.CCACHE_VARIANT }}
 
       - name: Build
+        id: build
+        run: >
+          cmake
+          --build ${{ github.workspace }}/build_${{ inputs.build-type }}
+          --config ${{ inputs.build-type }}
+          -j ${{ steps.cpu-cores.outputs.count }}
+
+      - name: Build (repeat on failure)
+        if: ${{ failure() && steps.build.conclusion == 'failure' }}
         run: >
           cmake
           --build ${{ github.workspace }}/build_${{ inputs.build-type }}
@@ -251,7 +260,16 @@ jobs:
           -DCMAKE_CXX_COMPILER_LAUNCHER=${{ env.CCACHE_VARIANT }}
 
       - name: Build release (Windows)
+        id: build-release
         if: ${{ env.RELEASE_WIN == 'true' }}
+        run: >
+          cmake
+          --build ${{ github.workspace }}/build
+          --config Release
+          -j ${{ steps.cpu-cores.outputs.count }}
+
+      - name: Build release (Windows, repeat on failure)
+        if: ${{ failure() && steps.build-release.conclusion == 'failure' }}
         run: >
           cmake
           --build ${{ github.workspace }}/build
