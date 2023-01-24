@@ -215,7 +215,7 @@ jobs:
         shell: bash
         run: |
           ${{ inputs.test-before }}
-          ctest -C ${{ inputs.build-type }} -T ${{ env.TEST_MODE }} --output-on-failure
+          ctest -C ${{ inputs.build-type }} -T ${{ env.TEST_MODE }} -j ${{ steps.cpu-cores.outputs.count }} --output-on-failure
           ${{ inputs.test-after }}
 
       - name: C++ Linter (Linux)
