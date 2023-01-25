@@ -22,6 +22,10 @@ on:
         description: "List of environment variables to set up, given in env=value format"
         required: false
         type: string
+      export-secrets:
+        description: "Export secrets to json file. If defined, this value belongs to the filename to be exported"
+        required: false
+        type: string
       linter:
         default: true
         description: "Use C++ linter. Only for Linux"
@@ -133,6 +137,12 @@ jobs:
           
           # Configure test mode
           echo "TEST_MODE=Test" >> $GITHUB_ENV
+
+      - name: Export secrets
+        if: ${{ inputs.export-secrets }}
+        env:
+          SECRETS_VARS: ${{ toJson(secrets) }}
+        run: echo "$SECRETS_VARS" > "${{ inputs.export-secrets }}"
 
       - name: Configure number of CPU cores
         uses: SimenB/github-actions-cpu-cores@v1
