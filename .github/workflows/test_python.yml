@@ -22,10 +22,6 @@ on:
         description: "List of environment variables to set up, given in env=value format"
         required: false
         type: string
-      export-secrets:
-        description: "Export secrets to json file. If defined, this value belongs to the filename to be exported"
-        required: false
-        type: string
       install-extras:
         default: test
         description: "Install with extras"
@@ -95,12 +91,6 @@ jobs:
           do
             printf "%s\n" $i >> $GITHUB_ENV
           done
-
-      - name: Export secrets
-        if: ${{ inputs.export-secrets }}
-        env:
-          SECRETS_VARS: ${{ toJson(secrets) }}
-        run: echo "$SECRETS_VARS" > "${{ inputs.export-secrets }}"
 
       - name: Set up Python ${{ inputs.python-version }}
         uses: actions/setup-python@v4
