@@ -17,5 +17,5 @@ strategy:
     ...
 with:
   os: ${{ matrix.os }}
-secrets: inherit
+  ...
 ```
