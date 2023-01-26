@@ -23,7 +23,6 @@ on:
         required: false
         type: string
       install-extras:
-        default: test
         description: "Install with extras"
         required: false
         type: string
