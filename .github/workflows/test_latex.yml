@@ -19,7 +19,12 @@ on:
         type: number
       upload-gdrive:
         default: false
-        description: "Upload to google drive. Requires secrets GDRIVE_NAME (the name of the new file in gdrive, optional), GDRIVE_FOLDERID, and GDRIVE_CREDENTIALS (encoded)"
+        description: "Upload to google drive. Requires secrets GDRIVE_FOLDERID and GDRIVE_CREDENTIALS"
+        required: false
+        type: boolean
+      upload-gdrive-name:
+        default: ""
+        description: "Name of the new file. If no defined, use the same of the compiled latex"
         required: false
         type: boolean
       upload-gdrive-overwrite:
@@ -38,8 +43,6 @@ on:
       GDRIVE_CREDENTIALS:
         required: false
       GDRIVE_FOLDERID:
-        required: false
-      GDRIVE_NAME:
         required: false
 
 jobs:
@@ -84,9 +87,7 @@ jobs:
           path: ${{ inputs.file }}.pdf
 
       - name: Upload PDF (Google Drive)
-        env:
-          name: ${{ secrets.GDRIVE_NAME }}
-        if: ${{ inputs.upload-gdrive && env.name == '' }}
+        if: ${{ inputs.upload-gdrive && inputs.upload-gdrive-name == '' }}
         uses: adityak74/google-drive-upload-git-action@main
         with:
           credentials: ${{ secrets.GDRIVE_CREDENTIALS }}
@@ -96,13 +97,11 @@ jobs:
           overwrite: ${{ inputs.upload-gdrive-overwrite }}
 
       - name: Upload PDF (Google Drive with custom name)
-        env:
-          name: ${{ secrets.GDRIVE_NAME }}
-        if: ${{ inputs.upload-gdrive && env.name != '' }}
+        if: ${{ inputs.upload-gdrive && inputs.upload-gdrive-name != '' }}
         uses: adityak74/google-drive-upload-git-action@main
         with:
           credentials: ${{ secrets.GDRIVE_CREDENTIALS }}
           filename: ${{ inputs.file }}.pdf
           folderId: ${{ secrets.GDRIVE_FOLDERID }}
-          name: ${{ secrets.GDRIVE_NAME }}
+          name: ${{ inputs.upload-gdrive-name }}
           overwrite: ${{ inputs.upload-gdrive-overwrite }}
