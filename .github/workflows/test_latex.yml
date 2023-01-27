@@ -90,7 +90,6 @@ jobs:
         uses: adityak74/google-drive-upload-git-action@main
         with:
           credentials: ${{ secrets.GDRIVE_CREDENTIALS }}
-          encoded: true
           filename: ${{ inputs.file }}.pdf
           folderId: ${{ secrets.GDRIVE_FOLDERID }}
           name: ${{ inputs.file }}.pdf
@@ -103,7 +102,6 @@ jobs:
         uses: adityak74/google-drive-upload-git-action@main
         with:
           credentials: ${{ secrets.GDRIVE_CREDENTIALS }}
-          encoded: true
           filename: ${{ inputs.file }}.pdf
           folderId: ${{ secrets.GDRIVE_FOLDERID }}
           name: ${{ secrets.GDRIVE_NAME }}
