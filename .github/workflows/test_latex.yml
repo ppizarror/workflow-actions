@@ -27,6 +27,11 @@ on:
         description: "Upload compiled PDF to github actions artifact"
         required: false
         type: boolean
+      upload-github-overwrite:
+        default: true
+        description: "Ovewrites the file if already exists with the same filename"
+        required: false
+        type: boolean
     secrets:
       ACTIONS:
         required: false
@@ -82,22 +87,24 @@ jobs:
         env:
           name: ${{ secrets.GDRIVE_NAME }}
         if: ${{ inputs.upload-gdrive && env.name == '' }}
-        uses: mathisve/gdrive-upload-action@main
+        uses: adityak74/google-drive-upload-git-action@main
         with:
           credentials: ${{ secrets.GDRIVE_CREDENTIALS }}
           encoded: true
           filename: ${{ inputs.file }}.pdf
           folderId: ${{ secrets.GDRIVE_FOLDERID }}
           name: ${{ inputs.file }}.pdf
+          overwrite: ${{ inputs.upload-github-overwrite }}
 
       - name: Upload PDF (Google Drive / custom name)
         env:
           name: ${{ secrets.GDRIVE_NAME }}
         if: ${{ inputs.upload-gdrive && env.name != '' }}
-        uses: mathisve/gdrive-upload-action@main
+        uses: adityak74/google-drive-upload-git-action@main
         with:
           credentials: ${{ secrets.GDRIVE_CREDENTIALS }}
           encoded: true
           filename: ${{ inputs.file }}.pdf
           folderId: ${{ secrets.GDRIVE_FOLDERID }}
           name: ${{ secrets.GDRIVE_NAME }}
+          overwrite: ${{ inputs.upload-github-overwrite }}
