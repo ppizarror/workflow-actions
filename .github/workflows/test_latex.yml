@@ -22,14 +22,14 @@ on:
         description: "Upload to google drive. Requires secrets GDRIVE_NAME (the name of the new file in gdrive, optional), GDRIVE_FOLDERID, and GDRIVE_CREDENTIALS (encoded)"
         required: false
         type: boolean
+      upload-gdrive-overwrite:
+        default: true
+        description: "Ovewrites the file if already exists with the same filename"
+        required: false
+        type: boolean
       upload-github:
         default: true
         description: "Upload compiled PDF to github actions artifact"
-        required: false
-        type: boolean
-      upload-github-overwrite:
-        default: true
-        description: "Ovewrites the file if already exists with the same filename"
         required: false
         type: boolean
     secrets:
@@ -94,9 +94,9 @@ jobs:
           filename: ${{ inputs.file }}.pdf
           folderId: ${{ secrets.GDRIVE_FOLDERID }}
           name: ${{ inputs.file }}.pdf
-          overwrite: ${{ inputs.upload-github-overwrite }}
+          overwrite: ${{ inputs.upload-gdrive-overwrite }}
 
-      - name: Upload PDF (Google Drive / custom name)
+      - name: Upload PDF (Google Drive with custom name)
         env:
           name: ${{ secrets.GDRIVE_NAME }}
         if: ${{ inputs.upload-gdrive && env.name != '' }}
@@ -107,4 +107,4 @@ jobs:
           filename: ${{ inputs.file }}.pdf
           folderId: ${{ secrets.GDRIVE_FOLDERID }}
           name: ${{ secrets.GDRIVE_NAME }}
-          overwrite: ${{ inputs.upload-github-overwrite }}
+          overwrite: ${{ inputs.upload-gdrive-overwrite }}
