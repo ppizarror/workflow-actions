@@ -24,12 +24,12 @@ on:
         type: boolean
       upload-gdrive-name:
         default: ""
-        description: "Name of the new file. If no defined, use the same of the compiled latex"
+        description: "Name of the new file, without extension. If no defined, use the same of the compiled latex"
         required: false
         type: boolean
       upload-gdrive-overwrite:
         default: true
-        description: "Ovewrites the file if already exists with the same filename"
+        description: "Overwrites the file if already exists with the same name"
         required: false
         type: boolean
       upload-github:
@@ -103,5 +103,5 @@ jobs:
           credentials: ${{ secrets.GDRIVE_CREDENTIALS }}
           filename: ${{ inputs.file }}.pdf
           folderId: ${{ secrets.GDRIVE_FOLDERID }}
-          name: ${{ inputs.upload-gdrive-name }}
+          name: ${{ inputs.upload-gdrive-name }}.pdf
           overwrite: ${{ inputs.upload-gdrive-overwrite }}
