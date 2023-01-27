@@ -17,14 +17,14 @@ on:
         description: "Job timeout"
         required: false
         type: number
+      upload-gdrive:
+        default: false
+        description: "Upload to google drive. Requires secrets GDRIVE_NAME (the name of the new file in gdrive, optional), GDRIVE_FOLDERID, and GDRIVE_CREDENTIALS (encoded)"
+        required: false
+        type: boolean
       upload-github:
         default: true
         description: "Upload compiled PDF to github actions artifact"
-        required: false
-        type: boolean
-      upload-google-drive:
-        default: false
-        description: "Upload to google drive. Requires secrets GDRIVE_NAME (the name of the new file in gdrive, optional), GDRIVE_FOLDERID, and GDRIVE_CREDENTIALS (encoded)"
         required: false
         type: boolean
     secrets:
@@ -81,7 +81,7 @@ jobs:
       - name: Upload PDF (Google Drive)
         env:
           name: ${{ secrets.GDRIVE_NAME }}
-        if: ${{ inputs.upload-google-drive && env.name == '' }}
+        if: ${{ inputs.upload-gdrive && env.name == '' }}
         uses: mathisve/gdrive-upload-action@main
         with:
           credentials: ${{ secrets.GDRIVE_CREDENTIALS }}
@@ -93,7 +93,7 @@ jobs:
       - name: Upload PDF (Google Drive / custom name)
         env:
           name: ${{ secrets.GDRIVE_NAME }}
-        if: ${{ inputs.upload-google-drive && env.name != '' }}
+        if: ${{ inputs.upload-gdrive && env.name != '' }}
         uses: mathisve/gdrive-upload-action@main
         with:
           credentials: ${{ secrets.GDRIVE_CREDENTIALS }}
