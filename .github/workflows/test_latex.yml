@@ -26,7 +26,7 @@ on:
         default: ""
         description: "Name of the new file, without extension. If no defined, use the same of the compiled latex"
         required: false
-        type: boolean
+        type: string
       upload-gdrive-overwrite:
         default: true
         description: "Overwrites the file if already exists with the same name"
