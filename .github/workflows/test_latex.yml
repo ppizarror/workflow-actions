@@ -17,8 +17,24 @@ on:
         description: "Job timeout"
         required: false
         type: number
+      upload-github:
+        default: true
+        description: "Upload compiled PDF to github actions artifact"
+        required: false
+        type: boolean
+      upload-google-drive:
+        default: false
+        description: "Upload to google drive. Requires secrets GDRIVE_NAME (the name of the new file in gdrive, optional), GDRIVE_FOLDERID, and GDRIVE_CREDENTIALS (encoded)"
+        required: false
+        type: boolean
     secrets:
       ACTIONS:
+        required: false
+      GDRIVE_CREDENTIALS:
+        required: false
+      GDRIVE_FOLDERID:
+        required: false
+      GDRIVE_NAME:
         required: false
 
 jobs:
@@ -55,8 +71,33 @@ jobs:
           ls -l
           file ${{ inputs.file }}.pdf | grep -q ' PDF '
 
-      - name: Upload PDF artifact
+      - name: Upload PDF (Github)
+        if: ${{ inputs.upload-github }}
         uses: actions/upload-artifact@v3
         with:
           name: ${{ inputs.file }}
           path: ${{ inputs.file }}.pdf
+
+      - name: Upload PDF (Google Drive)
+        env:
+          name: ${{ secrets.GDRIVE_NAME }}
+        if: ${{ inputs.upload-google-drive && env.name == '' }}
+        uses: mathisve/gdrive-upload-action@main
+        with:
+          credentials: ${{ secrets.GDRIVE_CREDENTIALS }}
+          encoded: true
+          filename: ${{ inputs.file }}.pdf
+          folderId: ${{ secrets.GDRIVE_FOLDERID }}
+          name: ${{ inputs.file }}.pdf
+
+      - name: Upload PDF (Google Drive / custom name)
+        env:
+          name: ${{ secrets.GDRIVE_NAME }}
+        if: ${{ inputs.upload-google-drive && env.name != '' }}
+        uses: mathisve/gdrive-upload-action@main
+        with:
+          credentials: ${{ secrets.GDRIVE_CREDENTIALS }}
+          encoded: true
+          filename: ${{ inputs.file }}.pdf
+          folderId: ${{ secrets.GDRIVE_FOLDERID }}
+          name: ${{ secrets.GDRIVE_NAME }}
