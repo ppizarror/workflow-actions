@@ -108,6 +108,16 @@ jobs:
 
       - name: Test
         if: ${{ inputs.test }}
+        id: test
+        shell: bash
+        run: |
+          export PYTHONPATH=$PWD
+          ${{ inputs.test-before }}
+          nose2 --verbose --with-coverage
+          ${{ inputs.test-after }}
+
+      - name: Test (repeat on failure)
+        if: ${{ inputs.test && failure() && steps.test.conclusion == 'failure' }}
         shell: bash
         run: |
           export PYTHONPATH=$PWD
