@@ -98,6 +98,10 @@ jobs:
           cache-dependency-path: ${{ inputs.cache-dependency-path }}
           python-version: ${{ inputs.python-version }}
 
+      - name: Update Python pip
+        shell: bash
+        run: pip install --upgrade pip
+
       - name: Install dependencies
         if: ${{ !inputs.install-extras }}
         run: pip install .
