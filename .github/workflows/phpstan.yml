@@ -39,3 +39,4 @@ jobs:
           configuration: ${{ inputs.configuration }}
           memory_limit: ${{ inputs.memory }}
           path: ${{ inputs.path }}
+          version: latest
