@@ -26,6 +26,11 @@ on:
         description: "Install with extras"
         required: false
         type: string
+      nose-args:
+        default: ""
+        description: "Extra arguments passed to nose"
+        required: false
+        type: string
       os:
         description: "OS to run the job"
         required: true
@@ -127,7 +132,7 @@ jobs:
         run: |
           export PYTHONPATH=$PWD
           ${{ inputs.test-before }}
-          nose2 --verbose --with-coverage
+          nose2 --verbose --with-coverage ${{ inputs.nose-args }}
           ${{ inputs.test-after }}
 
       - name: Coverage report
