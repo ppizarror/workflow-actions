@@ -46,7 +46,7 @@ on:
         required: false
         type: string
       qt-version:
-        default: "6.*"
+        default: "6.5.1"
         description: "QT: Which version to be installed"
         required: false
         type: string
