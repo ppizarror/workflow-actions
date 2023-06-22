@@ -18,6 +18,11 @@ on:
         description: "Number of commits to fetch. 0 indicates all history for all branches and tags"
         required: false
         type: number
+      cmake-check:
+        default: true
+        description: "Check CMake settings. Only for Linux"
+        required: false
+        type: boolean
       env-vars:
         description: "List of environment variables to set up, given in env=value format"
         required: false
@@ -58,6 +63,11 @@ on:
       release-windows-pr:
         default: true
         description: "Compile release only in PR mode"
+        required: false
+        type: boolean
+      static-analysis:
+        default: true
+        description: "Run static analysis before build. Only for Linux"
         required: false
         type: boolean
       test:
@@ -143,6 +153,7 @@ jobs:
         if: ${{ inputs.export-secrets }}
         env:
           SECRETS_VARS: ${{ toJson(secrets) }}
+        shell: bash
         run: echo "$SECRETS_VARS" > "${{ inputs.export-secrets }}"
 
       - name: Configure number of CPU cores
@@ -161,6 +172,9 @@ jobs:
       - name: Install dependencies
         shell: bash
         run: |
+          # Update python package manager
+          pip install --upgrade pip
+          
           # Post-configure QT
           if [ "${{ inputs.qt-install }}" = "true" ]; then
             qt_v=$(qmake -query QT_VERSION)
@@ -172,6 +186,13 @@ jobs:
             choco upgrade ccache
             choco install ninja
           fi
+
+      - name: Install cached dependencies (Linux)
+        if: ${{ runner.os == 'Linux' }}
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: cloc valgrind
+          version: 1.1
 
       - name: Install ccache
         if: ${{ inputs.build-type == 'Debug' }}
@@ -194,6 +215,57 @@ jobs:
 
       - name: Configure GCC problem matcher
         uses: ammaraskar/gcc-problem-matcher@master
+
+      - name: Check static analysis (Linux)
+        if: ${{ inputs.static-analysis && runner.os == 'Linux' }}
+        run: |
+          pip install flawfinder
+          
+          for i in *; do
+            if [ -d "$i" ]; then
+              if [ "$i" != "lib" ]; then
+                PYTHONUTF8=1 flawfinder "$i" --error-level=4
+              fi
+            elif [ -f "$i" ]; then
+              if [ "$i" = "*.cpp" ] || [ "$i" = "*.c" ] || [ "$i" = "*.cxx" ] || [ "$i" = "*.h" ] || [ "$i" = "*.hxx" ] || [ "$i" = "*.hpp" ]; then 
+                PYTHONUTF8=1 flawfinder "$i" --error-level=4
+              fi
+            fi
+          done
+
+      - name: Check CMake (Linux)
+        if: ${{ inputs.cmake-check && runner.os == 'Linux' }}
+        shell: bash
+        run: |
+          pip install cmakelint
+          
+          # Define methods that recursively finds cmake files
+          cmakelint_file() {
+            if [ "$1" = "*.cmake" ] || [ "$(basename "$1")" = "CMakeLists.txt" ]; then
+              echo "Checking CMake file: $1"
+              cmakelint --filter=-linelength,-readability/mixedcase "$i"
+            fi
+          }
+          cmakelint_recurse() {
+            for i in "$1"/*; do
+              if [ -d "$i" ]; then
+                cmakelint_recurse "$i"
+              elif [ -f "$i" ]; then
+                cmakelint_file "$i"
+              fi
+            done
+          }
+          
+          # Check root cmake files
+          for i in *; do
+            if [ -f "$i" ]; then
+              cmakelint_file "$i"
+            fi
+          done
+          
+          # Recursively find in src and test
+          cmakelint_recurse src
+          cmakelint_recurse test
 
       - name: Configure CMake
         run: >
