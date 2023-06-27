@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Filter changed files on path
-        if: ${{ filter-path == '' || steps.filter.outputs.path == 'true' }}
+        if: ${{ inputs.filter-path == '' || steps.filter.outputs.path == 'true' }}
         uses: dorny/paths-filter@v2
         id: filter
         with:
@@ -26,7 +26,7 @@ jobs:
               - '${{ inputs.filter-path }}**'
 
       - name: Install dependencies
-        if: ${{ filter-path == '' || steps.filter.outputs.path == 'true' }}
+        if: ${{ inputs.filter-path == '' || steps.filter.outputs.path == 'true' }}
         run: yarn
 
       - name: Run
