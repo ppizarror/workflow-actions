@@ -34,7 +34,7 @@ jobs:
         with:
           filters: |
             path:
-              - '${{ inputs.path }}/**'
+              - '${{ inputs.path }}**'
 
       - name: Configure composer
         if: steps.filter.outputs.path == 'true'
