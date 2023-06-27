@@ -37,13 +37,13 @@ jobs:
               - '${{ inputs.path }}**'
 
       - name: Configure composer
-        if: steps.filter.outputs.path == 'true'
+        if: ${{ steps.filter.outputs.path == 'true' }}
         uses: php-actions/composer@v6
         with:
           working_dir: ${{ inputs.composer }}
 
       - name: Run phpstan
-        if: steps.filter.outputs.path == 'true'
+        if: ${{ steps.filter.outputs.path == 'true' }}
         uses: php-actions/phpstan@v3
         with:
           configuration: ${{ inputs.configuration }}

@@ -2,6 +2,12 @@ name: ESLint
 
 on:
   workflow_call:
+    inputs:
+      filter-path:
+        default: ""
+        description: "Filters a certain path to prevent running linter on unintended changes"
+        required: false
+        type: string
 
 jobs:
   run:
@@ -10,7 +16,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Filter changed files on path
+        if: ${{ filter-path == '' || steps.filter.outputs.path == 'true' }}
+        uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            path:
+              - '${{ inputs.filter-path }}**'
+
       - name: Install dependencies
+        if: ${{ filter-path == '' || steps.filter.outputs.path == 'true' }}
         run: yarn
 
       - name: Run
