@@ -28,12 +28,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Filter changed files on path
+        uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            path:
+              - '${{ inputs.path }}/**'
+
       - name: Configure composer
+        if: steps.filter.outputs.path == 'true'
         uses: php-actions/composer@v6
         with:
           working_dir: ${{ inputs.composer }}
 
       - name: Run phpstan
+        if: steps.filter.outputs.path == 'true'
         uses: php-actions/phpstan@v3
         with:
           configuration: ${{ inputs.configuration }}
