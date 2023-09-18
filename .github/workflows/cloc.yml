@@ -1,0 +1,41 @@
+name: Cloc
+
+on:
+  workflow_call:
+    inputs:
+      ignore:
+        description: "Regex to ignore paths"
+        required: true
+        type: string
+      scan-path:
+        description: "List of paths to scan"
+        required: true
+        type: string
+      show-included-files:
+        default: false
+        description: "Display list of cloc files"
+        required: false
+        type: boolean
+
+jobs:
+  cloc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install cloc
+        if: ${{ runner.os == 'Linux' }}
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: cloc
+          version: 1.0
+
+      - name: Run cloc
+        shell: bash
+        run: cloc ${{ inputs.scan-path }} --found .cloc-${{ github.run_id }} --fullpath --not-match-d=${{ inputs.ignore }}
+
+      - name: Show cloc files
+        if: ${{ inputs.show-included-files }}
+        shell: bash
+        run: cat .cloc-${{ github.run_id }}
