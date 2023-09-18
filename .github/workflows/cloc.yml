@@ -33,7 +33,13 @@ jobs:
 
       - name: Run cloc
         shell: bash
-        run: cloc ${{ inputs.scan-path }} --found .cloc-${{ github.run_id }} --fullpath --not-match-d=${{ inputs.ignore }}
+        run: |
+          cloc_f=""
+          for i in "${{ inputs.scan-path }}"; do
+            cloc_f+=$i
+            cloc_f+=" "
+          done
+          cloc $cloc_f --found .cloc-${{ github.run_id }} --fullpath --not-match-d=${{ inputs.ignore }}
 
       - name: Show cloc files
         if: ${{ inputs.show-included-files }}

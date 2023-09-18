@@ -92,8 +92,7 @@ jobs:
         if: ${{ inputs.env-vars }}
         shell: bash
         run: |
-          for i in "${{ inputs.env-vars }}"
-          do
+          for i in "${{ inputs.env-vars }}"; do
             printf "%s\n" $i >> $GITHUB_ENV
           done
 

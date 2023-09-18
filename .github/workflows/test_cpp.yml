@@ -127,8 +127,7 @@ jobs:
           echo "QT_QPA_PLATFORM=offscreen" >> $GITHUB_ENV
           
           # Configure envs from workflow input
-          for i in "${{ inputs.env-vars }}"
-          do
+          for i in "${{ inputs.env-vars }}"; do
             printf "%s\n" $i >> $GITHUB_ENV
           done
           
