@@ -27,7 +27,7 @@ jobs:
       - name: Run cloc
         shell: bash
         run: |
-          apt install cloc
+          sudo apt-get install cloc
           cloc_f=""
           for i in "${{ inputs.scan-path }}"; do
             cloc_f+=$i
