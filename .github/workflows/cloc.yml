@@ -4,8 +4,9 @@ on:
   workflow_call:
     inputs:
       ignore:
+        default: ""
         description: "Regex to ignore paths"
-        required: true
+        required: false
         type: string
       scan-path:
         description: "List of paths to scan"
@@ -39,7 +40,11 @@ jobs:
             cloc_f+=$i
             cloc_f+=" "
           done
-          cloc $cloc_f --found .cloc-${{ github.run_id }} --fullpath --not-match-d=${{ inputs.ignore }}
+          if [ "${{ inputs.ignore }}" = "" ]; then
+            cloc $cloc_f --found .cloc-${{ github.run_id }}
+          else
+            cloc $cloc_f --found .cloc-${{ github.run_id }} --fullpath --not-match-d=${{ inputs.ignore }}
+          fi
 
       - name: Show cloc files
         if: ${{ inputs.show-included-files }}
