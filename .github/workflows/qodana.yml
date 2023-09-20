@@ -1,0 +1,25 @@
+name: Qodana
+
+on:
+  workflow_call:
+    secrets:
+      QODANA_ENABLED:
+        required: true
+      QODANA_TOKEN:
+        required: true
+
+jobs:
+  qodana:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        if: ${{ secrets.QODANA_ENABLED == 'true' }}
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Qodana Scan
+        if: ${{ secrets.QODANA_ENABLED == 'true' }}
+        uses: JetBrains/qodana-action@v2023.2
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
