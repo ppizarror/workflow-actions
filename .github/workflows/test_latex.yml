@@ -70,7 +70,7 @@ jobs:
           token: ${{ secrets.ACTIONS }}
 
       - name: Compile LaTeX document
-        uses: xu-cheng/latex-action@v2
+        uses: xu-cheng/latex-action@v3
         with:
           root_file: ${{ inputs.file }}.tex
 
