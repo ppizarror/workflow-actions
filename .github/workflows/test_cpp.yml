@@ -180,10 +180,12 @@ jobs:
             echo "QT_VERSION=$qt_v" >> $GITHUB_ENV
           fi
           
-          # Install packages for windows (ccache)
-          if [ "$RUNNER_OS" = "Windows" ] && [ "$CCACHE_VARIANT" = "ccache" ]; then
-            choco upgrade ccache
+          # Install packages for windows
+          if [ "$RUNNER_OS" = "Windows" ]; then
             choco install ninja
+            if [ "$CCACHE_VARIANT" = "ccache" ]; then
+              choco upgrade ccache
+            fi
           fi
 
       - name: Install cached dependencies (Linux)
