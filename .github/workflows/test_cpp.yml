@@ -171,7 +171,7 @@ jobs:
         shell: bash
         run: |
           # Update python package manager
-          python -m pip install --upgrade pip
+          python -m pip install -U pip
           
           # Post-configure QT
           if [ "${{ inputs.qt-install }}" = "true" ]; then
@@ -219,7 +219,7 @@ jobs:
       - name: Check static analysis (Linux)
         if: ${{ inputs.static-analysis && runner.os == 'Linux' }}
         run: |
-          pip install flawfinder
+          python -m pip install flawfinder
           
           for i in *; do
             if [ -d "$i" ]; then
@@ -237,7 +237,7 @@ jobs:
         if: ${{ inputs.cmake-check && runner.os == 'Linux' }}
         shell: bash
         run: |
-          pip install cmakelint
+          python -m pip install cmakelint
           
           # Define methods that recursively finds cmake files
           cmakelint_file() {
