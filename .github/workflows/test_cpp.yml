@@ -171,7 +171,7 @@ jobs:
         shell: bash
         run: |
           # Update python package manager
-          pip install --upgrade pip
+          python -m pip install --upgrade pip
           
           # Post-configure QT
           if [ "${{ inputs.qt-install }}" = "true" ]; then
