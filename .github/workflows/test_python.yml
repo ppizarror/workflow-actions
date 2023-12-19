@@ -104,15 +104,15 @@ jobs:
 
       - name: Update Python pip
         shell: bash
-        run: pip install --upgrade pip
+        run: python -m pip install -U pip
 
       - name: Install dependencies
         if: ${{ !inputs.install-extras }}
-        run: pip install .
+        run: python -m pip install .
 
       - name: Install dependencies (w/extras)
         if: ${{ inputs.install-extras }}
-        run: pip install -e .[${{ inputs.install-extras }}]
+        run: python -m pip install -e .[${{ inputs.install-extras }}]
 
       - name: Test
         if: ${{ inputs.test }}
