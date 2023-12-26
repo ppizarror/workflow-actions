@@ -72,7 +72,7 @@ jobs:
         env:
           token: ${{ secrets.ACTIONS }}
         if: ${{ env.token == '' }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: ${{ inputs.checkout-fetch-depth }}
           submodules: recursive
@@ -81,7 +81,7 @@ jobs:
         env:
           token: ${{ secrets.ACTIONS }}
         if: ${{ env.token != '' }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: ${{ inputs.checkout-fetch-depth }}
           submodules: recursive
@@ -96,7 +96,7 @@ jobs:
           done
 
       - name: Set up Python ${{ inputs.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           cache: pip
           cache-dependency-path: ${{ inputs.cache-dependency-path }}

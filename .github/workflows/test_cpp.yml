@@ -103,7 +103,7 @@ jobs:
         env:
           token: ${{ secrets.ACTIONS }}
         if: ${{ env.token == '' }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: ${{ inputs.checkout-fetch-depth }}
           submodules: recursive
@@ -112,7 +112,7 @@ jobs:
         env:
           token: ${{ secrets.ACTIONS }}
         if: ${{ env.token != '' }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: ${{ inputs.checkout-fetch-depth }}
           submodules: recursive
@@ -155,7 +155,7 @@ jobs:
         run: echo "$SECRETS_VARS" > "${{ inputs.export-secrets }}"
 
       - name: Configure number of CPU cores
-        uses: SimenB/github-actions-cpu-cores@v1
+        uses: SimenB/github-actions-cpu-cores@v2
         id: cpu-cores
 
       - name: Install QT

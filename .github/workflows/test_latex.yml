@@ -54,7 +54,7 @@ jobs:
         env:
           token: ${{ secrets.ACTIONS }}
         if: ${{ env.token == '' }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: ${{ inputs.checkout-fetch-depth }}
           submodules: recursive
@@ -63,7 +63,7 @@ jobs:
         env:
           token: ${{ secrets.ACTIONS }}
         if: ${{ env.token != '' }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: ${{ inputs.checkout-fetch-depth }}
           submodules: recursive
@@ -81,7 +81,7 @@ jobs:
 
       - name: Upload PDF (Github)
         if: ${{ inputs.upload-github }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.file }}
           path: ${{ inputs.file }}.pdf
