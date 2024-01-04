@@ -54,6 +54,11 @@ on:
         description: "Run a custom bash command before main test are executed. Runs inside root path"
         required: false
         type: string
+      test-repeat-on-failure:
+        default: false
+        description: "Run test repeat if failure"
+        required: false
+        type: boolean
       timeout:
         default: 120
         description: "Job timeout"
@@ -125,7 +130,7 @@ jobs:
           ${{ inputs.test-after }}
 
       - name: Test (repeat on failure)
-        if: ${{ inputs.test && failure() && steps.test.conclusion == 'failure' }}
+        if: ${{ inputs.test && inputs.test-repeat-on-failure && failure() && steps.test.conclusion == 'failure' }}
         shell: bash
         run: |
           export PYTHONPATH=$PWD

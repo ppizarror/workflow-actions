@@ -284,14 +284,6 @@ jobs:
           --config ${{ inputs.build-type }}
           -j ${{ steps.cpu-cores.outputs.count }}
 
-      - name: Build (repeat on failure)
-        if: ${{ failure() && steps.build.conclusion == 'failure' }}
-        run: >
-          cmake
-          --build ${{ github.workspace }}/build_${{ inputs.build-type }}
-          --config ${{ inputs.build-type }}
-          -j ${{ steps.cpu-cores.outputs.count }}
-
       - name: Test
         if: ${{ inputs.test }}
         working-directory: ${{ github.workspace }}/build_${{ inputs.build-type }}
@@ -351,17 +343,9 @@ jobs:
           --config Release
           -j ${{ steps.cpu-cores.outputs.count }}
 
-      - name: Build release (Windows, repeat on failure)
-        if: ${{ failure() && steps.build-release.conclusion == 'failure' }}
-        run: >
-          cmake
-          --build ${{ github.workspace }}/build
-          --config Release
-          -j ${{ steps.cpu-cores.outputs.count }}
-
       - name: Upload release artifact (Windows)
         if: ${{ env.RELEASE_WIN == 'true' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-windows
           path: ${{ github.workspace }}/build
