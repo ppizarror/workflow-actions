@@ -13,6 +13,11 @@ on:
         description: "Number of commits to fetch. 0 indicates all history for all branches and tags"
         required: false
         type: number
+      coverage:
+        default: true
+        description: "Run tests with coverage"
+        required: false
+        type: boolean
       coverage-report:
         default: true
         description: "Use coverage with codecov.io"
@@ -54,11 +59,6 @@ on:
         description: "Run a custom bash command before main test are executed. Runs inside root path"
         required: false
         type: string
-      test-repeat-on-failure:
-        default: false
-        description: "Run test repeat if failure"
-        required: false
-        type: boolean
       timeout:
         default: 120
         description: "Job timeout"
@@ -126,19 +126,14 @@ jobs:
         run: |
           export PYTHONPATH=$PWD
           ${{ inputs.test-before }}
-          nose2 --verbose --with-coverage
-          ${{ inputs.test-after }}
-
-      - name: Test (repeat on failure)
-        if: ${{ inputs.test && inputs.test-repeat-on-failure && failure() && steps.test.conclusion == 'failure' }}
-        shell: bash
-        run: |
-          export PYTHONPATH=$PWD
-          ${{ inputs.test-before }}
-          nose2 --verbose --with-coverage ${{ inputs.nose-args }}
+          if [ "${{ inputs.coverage }}" = "true" ]; then
+            nose2 --verbose --with-coverage ${{ inputs.nose-args }}
+          else
+            nose2 --verbose ${{ inputs.nose-args }}
+          fi
           ${{ inputs.test-after }}
 
       - name: Coverage report
-        if: ${{ inputs.coverage-report }}
+        if: ${{ inputs.coverage && inputs.coverage-report }}
         shell: bash
         run: bash <(curl -s https://codecov.io/bash)
