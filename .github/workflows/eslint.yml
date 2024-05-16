@@ -27,7 +27,7 @@ jobs:
 
       - name: Install dependencies
         if: ${{ inputs.filter-path == '' || steps.filter.outputs.path == 'true' }}
-        run: yarn
+        run: npm install
 
       - name: Run
         if: ${{ inputs.filter-path == '' || steps.filter.outputs.path == 'true' }}
