@@ -18,7 +18,7 @@ jobs:
 
       - name: Filter changed files on path
         if: ${{ inputs.filter-path != '' }}
-        uses: dorny/paths-filter@v2
+        uses: dorny/paths-filter@v3
         id: filter
         with:
           filters: |
