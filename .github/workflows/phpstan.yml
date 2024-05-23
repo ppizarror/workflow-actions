@@ -12,7 +12,7 @@ on:
         required: true
         type: string
       memory:
-        default: "256M"
+        default: "512M"
         description: "Memory limit"
         required: false
         type: string
