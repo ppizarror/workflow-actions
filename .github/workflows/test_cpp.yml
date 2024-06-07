@@ -195,7 +195,6 @@ jobs:
           version: 1.1
 
       - name: Install ccache
-        if: ${{ inputs.build-type == 'Debug' }}
         uses: hendrikmuhs/ccache-action@v1
         with:
           key: ${{ inputs.os }}-${{ inputs.build-type }}-qt${{ env.QT_VERSION }}
@@ -204,7 +203,6 @@ jobs:
           verbose: 2
 
       - name: Configure ccache
-        if: ${{ inputs.build-type == 'Debug' }}
         shell: bash
         run: |
           echo "Cache variant: $CCACHE_VARIANT"
@@ -268,6 +266,7 @@ jobs:
           cmakelint_recurse test
 
       - name: Configure CMake
+        if: ${{ inputs.test }}
         run: >
           cmake
           -B ${{ github.workspace }}/build_${{ inputs.build-type }}
@@ -277,6 +276,7 @@ jobs:
           -DCMAKE_CXX_COMPILER_LAUNCHER=${{ env.CCACHE_VARIANT }}
 
       - name: Build
+        if: ${{ inputs.test }}
         id: build
         run: >
           cmake
@@ -309,8 +309,8 @@ jobs:
           tidy-checks: ''
           version: 15
 
-      - name: Linter output check
-        if: ${{ steps.linter.outputs.checks-failed > 0 }}
+      - name: C++ Linter output check
+        if: ${{ inputs.linter && steps.linter.outputs.checks-failed > 0 }}
         run: exit 1
 
       - name: Check release requirements (Windows)
