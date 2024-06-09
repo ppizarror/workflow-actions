@@ -211,7 +211,7 @@ jobs:
             ccache -z # Zero stats
           fi
 
-      - name: Configure GCC problem matcher
+      - name: Configure gcc problem matcher
         uses: ammaraskar/gcc-problem-matcher@master
 
       - name: Check static analysis (Linux)
