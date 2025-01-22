@@ -51,7 +51,7 @@ on:
         required: false
         type: string
       qt-version:
-        default: "6.6.0"
+        default: "6.5.3"
         description: "QT: Which version to be installed"
         required: false
         type: string
@@ -160,7 +160,7 @@ jobs:
 
       - name: Install QT
         if: ${{ inputs.qt-install }}
-        uses: jurplel/install-qt-action@v3
+        uses: jurplel/install-qt-action@v4
         with:
           arch: ${{ env.QT_ARCH }}
           cache: true
@@ -301,13 +301,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.ACTIONS }}
         with:
           database: '${{ github.workspace }}/build_${{ inputs.build-type }}/compile_commands.json'
-          extra-args: '-std=c++17'
+          extra-args: '-std=c++17 -Wno-unused-variable -Wno-infinite-recursion -Wno-array-bounds -Wno-return-stack-address -Werror=implicit-function-declaration -Wshadow -Wno-shadow-field-in-constructor-modified -Wno-shadow-ivar -Wuninitialized -Wunused-label -Wunused-lambda-capture'
           files-changed-only: true
           ignore: 'build_${{ inputs.build-type }} | lib | ../Qt'
+          jobs: ${{ steps.cpu-cores.outputs.count }}
           lines-changed-only: false
           style: ''
           tidy-checks: ''
-          version: 15
+          verbosity: 'debug'
+          version: 18
 
       - name: C++ Linter output check
         if: ${{ inputs.linter && steps.linter.outputs.checks-failed > 0 }}
