@@ -36,14 +36,11 @@ jobs:
             path:
               - '${{ inputs.path }}**'
 
-      - name: Configure git
-        shell: bash
-        run: git config --global --add safe.directory /app
-
       - name: Configure composer
         if: ${{ steps.filter.outputs.path == 'true' }}
         uses: php-actions/composer@v6
         with:
+          version: 2.8.1
           working_dir: ${{ inputs.composer }}
 
       - name: Run phpstan
