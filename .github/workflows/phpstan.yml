@@ -64,5 +64,5 @@ jobs:
           memory_limit: ${{ inputs.memory }}
           path: ${{ inputs.path }}
           php_version: ${{ inputs.php }}
+          vendored_phpstan_path: ${{ inputs.composer }}/vendor/bin/phpstan
           version: composer
-          working_directory: ${{ inputs.composer }}
