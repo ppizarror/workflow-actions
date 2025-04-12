@@ -60,4 +60,24 @@ jobs:
         if: ${{ steps.filter.outputs.path == 'true' }}
         shell: bash
         run: |
-          ${{ inputs.composer }}/vendor/bin/phpstan analyze -c ${{ inputs.configuration }} ${{ inputs.path }} --memory-limit ${{ inputs.memory }}
+          # Define the paths based on inputs.
+          phpstan_bin="${{ inputs.composer }}/vendor/bin/phpstan"
+          phpstan_cfg="${{ inputs.configuration }}"
+          target_path="${{ inputs.path }}"
+          
+          # Validate
+          if [ ! -f "$phpstan_bin" ]; then
+            echo "Error: PHPStan binary not found at $phpstan_bin"
+            exit 1
+          fi
+          if [ ! -f "$phpstan_cfg" ]; then
+            echo "Error: PHPStan configuration file not found at $phpstan_cfg"
+            exit 1
+          fi
+          if [ ! -e "$target_path" ]; then
+            echo "Error: Target path not found: $target_path"
+            exit 1
+          fi
+          
+          # Run script
+          "$phpstan_bin" analyze -c "$phpstan_cfg" "$target_path" --memory-limit ${{ inputs.memory }}
