@@ -36,6 +36,10 @@ jobs:
             path:
               - '${{ inputs.path }}**'
 
+      - name: Configure git
+        shell: bash
+        run: git config --global --add safe.directory /app
+
       - name: Configure composer
         if: ${{ steps.filter.outputs.path == 'true' }}
         uses: php-actions/composer@v6
