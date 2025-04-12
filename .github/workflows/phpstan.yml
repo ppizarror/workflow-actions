@@ -20,6 +20,11 @@ on:
         description: "Which path of the project to scan for"
         required: true
         type: string
+      php:
+        default: "8.3"
+        description: "PHP version to use"
+        required: false
+        type: string
 
 jobs:
   analyze:
@@ -36,13 +41,12 @@ jobs:
             path:
               - '${{ inputs.path }}**'
 
-
       - name: Install PHP
         if: ${{ steps.filter.outputs.path == 'true' }}
         uses: shivammathur/setup-php@v2
         with:
           coverage: none
-          php-version: '8.3'
+          php-version: ${{ inputs.php }}
           tools: none
 
       - name: Install composer
@@ -52,17 +56,6 @@ jobs:
           version: 2.8.1
           working_dir: ${{ inputs.composer }}
 
-      - name: Fix vendor permissions
-        if: ${{ steps.filter.outputs.path == 'true' }}
-        working-directory: ${{ inputs.composer }}
-        run: chmod -R 777 vendor
-
-      - name: Configure composer
-        if: ${{ steps.filter.outputs.path == 'true' }}
-        working-directory: ${{ inputs.composer }}
-        shell: bash
-        run: composer dumpautoload
-
       - name: Run phpstan
         if: ${{ steps.filter.outputs.path == 'true' }}
         uses: php-actions/phpstan@v3
@@ -70,4 +63,5 @@ jobs:
           configuration: ${{ inputs.configuration }}
           memory_limit: ${{ inputs.memory }}
           path: ${{ inputs.path }}
-          version: latest
+          php_version: ${{ inputs.php }}
+          version: composer
