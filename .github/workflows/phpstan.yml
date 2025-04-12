@@ -36,6 +36,13 @@ jobs:
             path:
               - '${{ inputs.path }}**'
 
+
+      - name: Install PHP
+        uses: "shivammathur/setup-php@v2"
+        with:
+          coverage: none
+          php-version: '8.3'
+
       - name: Configure composer
         if: ${{ steps.filter.outputs.path == 'true' }}
         uses: php-actions/composer@v6
