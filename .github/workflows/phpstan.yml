@@ -38,17 +38,25 @@ jobs:
 
 
       - name: Install PHP
+        if: ${{ steps.filter.outputs.path == 'true' }}
         uses: shivammathur/setup-php@v2
         with:
           coverage: none
           php-version: '8.3'
+          tools: none
 
-      - name: Configure composer
+      - name: Install composer
         if: ${{ steps.filter.outputs.path == 'true' }}
         uses: php-actions/composer@v6
         with:
           version: 2.8.1
           working_dir: ${{ inputs.composer }}
+
+      - name: Configure composer
+        if: ${{ steps.filter.outputs.path == 'true' }}
+        working-directory: ${{ inputs.composer }}
+        shell: bash
+        run: composer dumpautoload
 
       - name: Run phpstan
         if: ${{ steps.filter.outputs.path == 'true' }}
