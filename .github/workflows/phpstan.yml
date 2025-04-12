@@ -52,6 +52,11 @@ jobs:
           version: 2.8.1
           working_dir: ${{ inputs.composer }}
 
+      - name: Fix vendor permissions
+        if: ${{ steps.filter.outputs.path == 'true' }}
+        working-directory: ${{ inputs.composer }}
+        run: chmod -R 777 vendor
+
       - name: Configure composer
         if: ${{ steps.filter.outputs.path == 'true' }}
         working-directory: ${{ inputs.composer }}
