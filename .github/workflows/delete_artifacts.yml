@@ -25,11 +25,14 @@ jobs:
                   console.log(`Ignoring delete self-run ${workflow_run.id}`)
                   continue
                 }
-                console.log(`Deleting artifacts from workflow run ${workflow_run.id}`)
                 const response = await github.request(`GET /repos/${{ github.repository }}/actions/runs/${workflow_run.id}/artifacts`)
-                for (artifact of response.data.artifacts) {
-                  console.log(`\tDeleting artifact with id ${artifact.id}`)
-                  const deleteResponse = await github.request(`DELETE /repos/${{ github.repository }}/actions/artifacts/${artifact.id}`)
+                if (response.data.artifacts) {
+                  console.log(`Deleting artifacts from workflow run ${workflow_run.id}`)
+                  for (artifact of response.data.artifacts) {
+                    console.log(`\tDeleting artifact with id ${artifact.id}`)
+                    const deleteResponse = await github.request(`DELETE /repos/${{ github.repository }}/actions/artifacts/${artifact.id}`)
+                  }
+                  break
                 }
               }
             }
