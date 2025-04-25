@@ -197,6 +197,7 @@ jobs:
       - name: Install ccache
         uses: hendrikmuhs/ccache-action@v1
         with:
+          append-timestamp: false
           key: ${{ inputs.os }}-${{ inputs.build-type }}-qt${{ env.QT_VERSION }}
           max-size: ${{ inputs.ccache-max-size }}
           variant: ${{ env.CCACHE_VARIANT }}
