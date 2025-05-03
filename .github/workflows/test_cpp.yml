@@ -3,11 +3,6 @@ name: Test C++
 on:
   workflow_call:
     inputs:
-      build-type:
-        default: "Debug"
-        description: "Which build type to use for C++ (Debug, Release, etc.)"
-        required: false
-        type: string
       ccache-max-size:
         default: "1G"
         description: "Max size of ccache"
@@ -134,14 +129,10 @@ jobs:
           if [ "$RUNNER_OS" = "Windows" ]; then
             echo "CMAKE_GENERATOR='Ninja'" >> $GITHUB_ENV
             echo "QT_ARCH=win64_mingw" >> $GITHUB_ENV
-            if [ "${{ inputs.build-type }}" = "Debug" ]; then
-              echo "CCACHE_VARIANT=sccache" >> $GITHUB_ENV
-            fi
+            echo "CCACHE_VARIANT=sccache" >> $GITHUB_ENV
           else
             echo "CMAKE_GENERATOR='Unix Makefiles'" >> $GITHUB_ENV
-            if [ "${{ inputs.build-type }}" = "Debug" ]; then
-              echo "CCACHE_VARIANT=ccache" >> $GITHUB_ENV
-            fi
+            echo "CCACHE_VARIANT=ccache" >> $GITHUB_ENV
           fi
           
           # Configure test mode
@@ -198,7 +189,7 @@ jobs:
         uses: hendrikmuhs/ccache-action@v1
         with:
           append-timestamp: false
-          key: ${{ inputs.os }}-${{ inputs.build-type }}-qt${{ env.QT_VERSION }}
+          key: ${{ inputs.os }}-Debug-qt${{ env.QT_VERSION }}
           max-size: ${{ inputs.ccache-max-size }}
           variant: ${{ env.CCACHE_VARIANT }}
           verbose: 2
@@ -270,8 +261,8 @@ jobs:
         if: ${{ inputs.test }}
         run: >
           cmake
-          -B ${{ github.workspace }}/build_${{ inputs.build-type }}
-          -DCMAKE_BUILD_TYPE=${{ inputs.build-type }}
+          -B ${{ github.workspace }}/build_debug
+          -DCMAKE_BUILD_TYPE=Debug
           -G ${{ env.CMAKE_GENERATOR }}
           -DCMAKE_C_COMPILER_LAUNCHER=${{ env.CCACHE_VARIANT }}
           -DCMAKE_CXX_COMPILER_LAUNCHER=${{ env.CCACHE_VARIANT }}
@@ -281,17 +272,17 @@ jobs:
         id: build
         run: >
           cmake
-          --build ${{ github.workspace }}/build_${{ inputs.build-type }}
-          --config ${{ inputs.build-type }}
+          --build ${{ github.workspace }}/build_debug
+          --config Debug
           -j ${{ steps.cpu-cores.outputs.count }}
 
       - name: Test
         if: ${{ inputs.test }}
-        working-directory: ${{ github.workspace }}/build_${{ inputs.build-type }}
+        working-directory: ${{ github.workspace }}/build_debug
         shell: bash
         run: |
           ${{ inputs.test-before }}
-          ctest -C ${{ inputs.build-type }} -T ${{ env.TEST_MODE }} -j ${{ steps.cpu-cores.outputs.count }} --verbose
+          ctest -C Debug -T ${{ env.TEST_MODE }} -j ${{ steps.cpu-cores.outputs.count }} --verbose
           ${{ inputs.test-after }}
 
       - name: C++ Linter (Linux)
@@ -301,10 +292,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.ACTIONS }}
         with:
-          database: '${{ github.workspace }}/build_${{ inputs.build-type }}/compile_commands.json'
+          database: '${{ github.workspace }}/build_debug/compile_commands.json'
           extra-args: '-std=c++17 -Wno-unused-variable -Wno-infinite-recursion -Wno-array-bounds -Wno-return-stack-address -Werror=implicit-function-declaration -Wshadow -Wno-shadow-field-in-constructor-modified -Wno-shadow-ivar -Wuninitialized -Wunused-label -Wunused-lambda-capture'
           files-changed-only: true
-          ignore: 'build_${{ inputs.build-type }} | lib | ../Qt'
+          ignore: 'build_debug | lib | ../Qt'
           jobs: ${{ steps.cpu-cores.outputs.count }}
           lines-changed-only: false
           style: ''
