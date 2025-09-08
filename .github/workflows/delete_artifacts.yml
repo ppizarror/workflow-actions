@@ -9,30 +9,55 @@ on:
         required: false
         type: boolean
 
+permissions:
+  actions: write
+  contents: read
+
 jobs:
   delete:
     runs-on: ubuntu-latest
     steps:
+      - name: Skip on forked PR (no write perms)
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork }}
+        run: |
+          echo "Skipping artifact deletion due to read-only token on forked PR."
+          exit 0
+
       - name: Delete artifacts from previous runs
         if: ${{ !inputs.pr || inputs.pr && github.event_name == 'pull_request' }}
         uses: actions/github-script@v7
         with:
           script: |
-            const runsResponse = await github.request("GET /repos/${{ github.repository }}/actions/runs")
-            for (workflow_run of runsResponse.data.workflow_runs) {
-              if (workflow_run.name == "${{ github.workflow }}" && workflow_run.status !== "in_progress") {
-                if (workflow_run.id == "${{ github.run_id }}") {
-                  console.log(`Ignoring delete self-run ${workflow_run.id}`)
-                  continue
-                }
-                const response = await github.request(`GET /repos/${{ github.repository }}/actions/runs/${workflow_run.id}/artifacts`)
-                if (response.data.artifacts) {
-                  console.log(`Deleting artifacts from workflow run ${workflow_run.id}`)
-                  for (artifact of response.data.artifacts) {
-                    console.log(`\tDeleting artifact with id ${artifact.id}`)
-                    const deleteResponse = await github.request(`DELETE /repos/${{ github.repository }}/actions/artifacts/${artifact.id}`)
+            try {
+              const runsResponse = await github.request("GET /repos/${{ github.repository }}/actions/runs");
+              for (workflow_run of runsResponse.data.workflow_runs) {
+                if (workflow_run.name == "${{ github.workflow }}" && workflow_run.status !== "in_progress") {
+                  if (workflow_run.id == "${{ github.run_id }}") {
+                    core.info(`Ignoring delete self-run ${workflow_run.id}`);
+                    continue;
                   }
-                  break
+                  const response = await github.request(`GET /repos/${{ github.repository }}/actions/runs/${workflow_run.id}/artifacts`);
+                  if (response.data.artifacts && response.data.artifacts.length > 0) {
+                    core.info(`Deleting artifacts from workflow run ${workflow_run.id}`);
+                    for (artifact of response.data.artifacts) {
+                      core.info(`\tDeleting artifact with id ${artifact.id}`);
+                      await github.request(`DELETE /repos/${{ github.repository }}/actions/artifacts/${artifact.id}`);
+                    }
+                    break;
+                  }
                 }
               }
+            } catch (e) {
+              if (e.status === 403) {
+                core.setFailed([
+                  'Missing permission to delete artifacts',
+                  '',
+                  'How to fix:',
+                  '1) Ensure this workflow requests: permissions: actions: write',
+                  '2) In the repository: Settings → Actions → General → Workflow permissions → set "Read and write permissions",',
+                  '3) Note: pull_request events from forks always have a read-only token (can’t be elevated).',
+                ].join('\n'));
+                return;
+              }
+              throw e;
             }
