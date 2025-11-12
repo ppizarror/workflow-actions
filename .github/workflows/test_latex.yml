@@ -72,7 +72,6 @@ jobs:
       - name: Compile LaTeX document
         uses: xu-cheng/latex-action@v4
         with:
-          extra_system_packages: ghostscript
           root_file: ${{ inputs.file }}.tex
 
       - name: Check pdf files
