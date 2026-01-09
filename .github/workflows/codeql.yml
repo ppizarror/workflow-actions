@@ -3,6 +3,11 @@ name: CodeQL
 on:
   workflow_call:
     inputs:
+      autobuild:
+        description: "Autobuild settings"
+        required: false
+        type: string
+        default: "autobuild"
       language:
         description: "Which language to check"
         required: true
@@ -29,7 +34,7 @@ jobs:
         with:
           languages: ${{ inputs.language }}
           queries: +security-and-quality
-          build-mode: autobuild
+          build-mode: ${{ inputs.autobuild }}
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
