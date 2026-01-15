@@ -7,7 +7,7 @@ on:
         description: "Autobuild settings"
         required: false
         type: string
-        default: "autobuild"
+        default: "none"
       language:
         description: "Which language to check"
         required: true
