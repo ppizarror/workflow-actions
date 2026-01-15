@@ -19,7 +19,7 @@ on:
         required: false
         type: boolean
       coverage-report:
-        default: true
+        default: false
         description: "Use coverage with codecov.io"
         required: false
         type: boolean
