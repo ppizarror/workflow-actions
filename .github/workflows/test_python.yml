@@ -23,6 +23,11 @@ on:
         description: "Use coverage with codecov.io"
         required: false
         type: boolean
+      engine:
+        default: "nose2"
+        description: "Test engine to use. Supported: nose2, pytest"
+        required: false
+        type: string
       env-vars:
         description: "List of environment variables to set up, given in env=value format"
         required: false
@@ -137,10 +142,22 @@ jobs:
         run: |
           export PYTHONPATH=$PWD
           ${{ inputs.test-before }}
-          if [ "${{ inputs.coverage }}" = "true" ]; then
-            nose2 --verbose --with-coverage ${{ inputs.nose-args }}
+          ENGINE="${{ inputs.engine }}"
+          if [ "$ENGINE" = "nose2" ]; then
+            if [ "${{ inputs.coverage }}" = "true" ]; then
+              nose2 --verbose --with-coverage ${{ inputs.nose-args }}
+            else
+              nose2 --verbose ${{ inputs.nose-args }}
+            fi
+          elif [ "$ENGINE" = "pytest" ]; then
+            if [ "${{ inputs.coverage }}" = "true" ]; then
+              pytest --cov=pygame_menu
+            else
+              pytest
+            fi
           else
-            nose2 --verbose ${{ inputs.nose-args }}
+            echo "Unsupported engine: $ENGINE"
+            exit 1
           fi
           ${{ inputs.test-after }}
 
