@@ -86,7 +86,7 @@ jobs:
         env:
           token: ${{ secrets.ACTIONS }}
         if: ${{ env.token == '' }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: ${{ inputs.checkout-fetch-depth }}
           submodules: recursive
@@ -95,7 +95,7 @@ jobs:
         env:
           token: ${{ secrets.ACTIONS }}
         if: ${{ env.token != '' }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: ${{ inputs.checkout-fetch-depth }}
           submodules: recursive
@@ -117,7 +117,7 @@ jobs:
         run: echo "$SECRETS_VARS" > "${{ inputs.export-secrets }}"
 
       - name: Set up Python ${{ inputs.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           cache: pip
           cache-dependency-path: ${{ inputs.cache-dependency-path }}

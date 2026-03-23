@@ -108,7 +108,7 @@ jobs:
         env:
           token: ${{ secrets.ACTIONS }}
         if: ${{ env.token == '' }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: ${{ inputs.checkout-fetch-depth }}
           submodules: recursive
@@ -117,7 +117,7 @@ jobs:
         env:
           token: ${{ secrets.ACTIONS }}
         if: ${{ env.token != '' }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: ${{ inputs.checkout-fetch-depth }}
           submodules: recursive
@@ -133,7 +133,7 @@ jobs:
           # Workflow info
           echo "Test workflow action:"
           echo "- Author: @ppizarror"
-          echo "- Version: 2.91"
+          echo "- Version: 2.92"
           
           # Configure global environments
           echo "GTEST_COLOR=1" >> $GITHUB_ENV
@@ -381,7 +381,7 @@ jobs:
 
       - name: Upload release artifact (Windows)
         if: ${{ env.RELEASE_WIN == 'true' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@main
         with:
           name: build-windows
           path: ${{ env.DEBUG_BUILD_PATH }}
