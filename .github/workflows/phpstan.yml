@@ -21,7 +21,7 @@ on:
         required: true
         type: string
       php:
-        default: "8.5"
+        default: "8.3"
         description: "PHP version to use"
         required: false
         type: string
