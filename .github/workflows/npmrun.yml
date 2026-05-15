@@ -12,6 +12,11 @@ on:
         description: "Filters a certain path to prevent running on unintended changes"
         required: false
         type: string
+      node-version:
+        default: "22"
+        description: "Node.js version to use (e.g. '22', '24', 'lts/*'). pnpm 11+ requires Node >= 22.13"
+        required: false
+        type: string
 
 jobs:
   run:
@@ -41,7 +46,13 @@ jobs:
 
       - name: Setup pnpm
         if: ${{ (inputs.filter-path == '' || steps.filter.outputs.path == 'true') && steps.pm.outputs.manager == 'pnpm' }}
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js ${{ inputs.node-version }}
+        if: ${{ inputs.filter-path == '' || steps.filter.outputs.path == 'true' }}
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ inputs.node-version }}
 
       - name: Install dependencies
         if: ${{ inputs.filter-path == '' || steps.filter.outputs.path == 'true' }}
