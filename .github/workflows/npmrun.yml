@@ -1,11 +1,15 @@
-name: ESLint
+name: NPM Run
 
 on:
   workflow_call:
     inputs:
+      action:
+        description: "npm/pnpm script(s) to run, comma or newline separated (e.g. 'lint' or 'test, lint'). Runs in order, stops on first failure."
+        required: true
+        type: string
       filter-path:
         default: ""
-        description: "Filters a certain path to prevent running linter on unintended changes"
+        description: "Filters a certain path to prevent running on unintended changes"
         required: false
         type: string
 
@@ -45,4 +49,14 @@ jobs:
 
       - name: Run
         if: ${{ inputs.filter-path == '' || steps.filter.outputs.path == 'true' }}
-        run: ${{ steps.pm.outputs.manager }} run lint
+        env:
+          ACTIONS: ${{ inputs.action }}
+          MANAGER: ${{ steps.pm.outputs.manager }}
+        run: |
+          echo "$ACTIONS" | tr ',' '\n' | while IFS= read -r script; do
+            script="$(echo "$script" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+            [ -z "$script" ] && continue
+            echo "::group::$MANAGER run $script"
+            "$MANAGER" run "$script"
+            echo "::endgroup::"
+          done
