@@ -10,8 +10,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Detect package manager
+        id: pm
+        run: |
+          if [ -f pnpm-lock.yaml ]; then
+            echo "manager=pnpm" >> "$GITHUB_OUTPUT"
+          else
+            echo "manager=npm" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup pnpm
+        if: ${{ steps.pm.outputs.manager == 'pnpm' }}
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Install dependencies
-        run: npm install
+        run: ${{ steps.pm.outputs.manager }} install
 
       - name: Run
-        run: npm run test
+        run: ${{ steps.pm.outputs.manager }} run test

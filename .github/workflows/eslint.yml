@@ -25,10 +25,26 @@ jobs:
             path:
               - '${{ inputs.filter-path }}**'
 
+      - name: Detect package manager
+        id: pm
+        if: ${{ inputs.filter-path == '' || steps.filter.outputs.path == 'true' }}
+        run: |
+          if [ -f pnpm-lock.yaml ]; then
+            echo "manager=pnpm" >> "$GITHUB_OUTPUT"
+          else
+            echo "manager=npm" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup pnpm
+        if: ${{ (inputs.filter-path == '' || steps.filter.outputs.path == 'true') && steps.pm.outputs.manager == 'pnpm' }}
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Install dependencies
         if: ${{ inputs.filter-path == '' || steps.filter.outputs.path == 'true' }}
-        run: npm install
+        run: ${{ steps.pm.outputs.manager }} install
 
       - name: Run
         if: ${{ inputs.filter-path == '' || steps.filter.outputs.path == 'true' }}
-        run: npm run lint
+        run: ${{ steps.pm.outputs.manager }} run lint
