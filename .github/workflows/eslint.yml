@@ -38,8 +38,6 @@ jobs:
       - name: Setup pnpm
         if: ${{ (inputs.filter-path == '' || steps.filter.outputs.path == 'true') && steps.pm.outputs.manager == 'pnpm' }}
         uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
       - name: Install dependencies
         if: ${{ inputs.filter-path == '' || steps.filter.outputs.path == 'true' }}
